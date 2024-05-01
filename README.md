@@ -1,6 +1,8 @@
-# elevite
+# Serika
 
-An Electron application with React and TypeScript
+An Electron application with TypeScript
+
+<!-- and react... perhaps -->
 
 ## Recommended IDE Setup
 
