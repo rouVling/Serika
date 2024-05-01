@@ -1,4 +1,4 @@
-import { app, shell, BrowserWindow, ipcMain } from 'electron'
+import { app, shell, BrowserWindow, ipcMain, screen } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
@@ -6,16 +6,30 @@ import icon from '../../resources/icon.png?asset'
 function createWindow(): void {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
-    width: 900,
-    height: 670,
+    width: 230,
+    height: 350,
     show: false,
     autoHideMenuBar: true,
+    transparent: true,
+    // titleBarStyle: 'hidden',
+    titleBarStyle: 'hiddenInset',
+    alwaysOnTop: true,
+    frame: false,
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: false
     }
   })
+
+  // 窗口放在右下角，在菜单栏上
+  const { width, height } = screen.getPrimaryDisplay().workAreaSize
+  const [ windowWidth, windowHeight ] = mainWindow.getSize(); 
+  mainWindow.setPosition(width - windowWidth, height - windowHeight);
+
+
+
+  // mainWindow.setPosition(0, 0);
 
   mainWindow.on('ready-to-show', () => {
     mainWindow.show()

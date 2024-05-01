@@ -43,7 +43,7 @@ export class LAppView {
    * 初期化する。
    */
   public initialize(): void {
-    const { width, height } = canvas;
+    const { width, height } = canvas!;
 
     const ratio: number = width / height;
     const left: number = -ratio;
@@ -121,8 +121,8 @@ export class LAppView {
    * 画像の初期化を行う。
    */
   public initializeSprite(): void {
-    const width: number = canvas.width;
-    const height: number = canvas.height;
+    const width: number = canvas!.width;
+    const height: number = canvas!.height;
 
     const textureManager = LAppDelegate.getInstance().getTextureManager();
     const resourcesPath = LAppDefine.ResourcesPath;
@@ -132,23 +132,26 @@ export class LAppView {
     // 背景画像初期化
     imageName = LAppDefine.BackImageName;
 
+    // gl?.clearColor(0, 0, 0, 0);
     // 非同期なのでコールバック関数を作成
-    const initBackGroundTexture = (textureInfo: TextureInfo): void => {
-      const x: number = width * 0.5;
-      const y: number = height * 0.5;
+    // 由于是异步的，所以创建回调函数
+    // const initBackGroundTexture = (textureInfo: TextureInfo): void => {
+    //   const x: number = width * 0.5;
+    //   const y: number = height * 0.5;
 
-      const fwidth = textureInfo.width * 2.0;
-      const fheight = height * 0.95;
-      this._back = new LAppSprite(x, y, fwidth, fheight, textureInfo.id);
-    };
+    //   const fwidth = textureInfo.width * 2.0;
+    //   const fheight = height * 0.95;
+    //   this._back = new LAppSprite(x, y, fwidth, fheight, textureInfo.id);
+    // };
 
-    textureManager.createTextureFromPngFile(
-      resourcesPath + imageName,
-      false,
-      initBackGroundTexture
-    );
+    // textureManager.createTextureFromPngFile(
+    //   resourcesPath + imageName,
+    //   false,
+    //   initBackGroundTexture
+    // );
 
     // 歯車画像初期化
+    // 齿轮图像初始化
     imageName = LAppDefine.GearImageName;
     const initGearTexture = (textureInfo: TextureInfo): void => {
       const x = width - textureInfo.width * 0.5;

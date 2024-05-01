@@ -5,9 +5,11 @@
  * that can be found at https://www.live2d.com/eula/live2d-open-software-license-agreement_en.html.
  */
 
-export let canvas: HTMLCanvasElement = null;
-export let gl: WebGLRenderingContext = null;
-export let s_instance: LAppGlManager = null;
+export let canvas: HTMLCanvasElement | null = null;
+export let gl: WebGLRenderingContext | null = null;
+export let s_instance: LAppGlManager | null = null;
+
+let mygl: WebGLRenderingContext | null = null;
 
 /**
  * Cubism SDKのサンプルで使用するWebGLを管理するクラス
@@ -41,14 +43,22 @@ export class LAppGlManager {
   constructor() {
     // キャンバスの作成
     canvas = document.createElement('canvas');
+    canvas.style.backgroundColor = 'transparent';
 
     // glコンテキストを初期化
     // @ts-ignore
-    gl = canvas.getContext('webgl2');
+    // mygl = canvas.getContext('webgl2', {alpha: false});
+    // mygl = canvas.getContext('webgl2', {alpha: true});
+    gl = canvas.getContext('webgl2', {alpha: true});
+    // mygl?.clearColor(0, 0, 0, 0);
+    // mygl?.clear(mygl.COLOR_BUFFER_BIT);
+    // mygl?.enable(mygl.BLEND);
+
+    // gl = null;
 
     if (!gl) {
       // gl初期化失敗
-      alert('Cannot initialize WebGL. This browser does not support.');
+      // alert('Cannot initialize WebGL. This browser does not support.');
       gl = null;
 
       document.body.innerHTML =

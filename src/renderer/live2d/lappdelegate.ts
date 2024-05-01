@@ -17,6 +17,8 @@ import { canvas, gl } from './lappglmanager';
 export let s_instance: LAppDelegate = null;
 export let frameBuffer: WebGLFramebuffer = null;
 
+
+
 /**
  * アプリケーションクラス。
  * Cubism SDKの管理を行う。
@@ -66,7 +68,21 @@ export class LAppDelegate {
   public initialize(): boolean {
     // キャンバスを DOM に追加
     // 将画布添加到 DOM
-    document.body.appendChild(canvas);
+    // document.body.appendChild(canvas);
+
+    // wait for 1s to debug
+    // setTimeout(() => {
+    //   LAppPal.printMessage("CubismDebug: 1s passed")
+    // }, 1000);
+
+    let parent = document.getElementById('live2d');
+    if (parent) {
+      // insert into div: parent
+      parent.appendChild(canvas);
+    } else {
+      document.body.appendChild(canvas);
+    }
+
 
     if (LAppDefine.CanvasSize === 'auto') {
       this._resizeCanvas();
@@ -150,22 +166,27 @@ export class LAppDelegate {
       LAppPal.updateTime();
 
       // 画面の初期化
-      gl.clearColor(0.0, 0.0, 0.0, 1.0);
+      // 屏幕初始化
+      gl!.clearColor(0.0, 0.0, 0.0, 1.0);
 
       // 深度テストを有効化
-      gl.enable(gl.DEPTH_TEST);
+      // 启用深度测试
+      gl!.enable(gl!.DEPTH_TEST);
 
       // 近くにある物体は、遠くにある物体を覆い隠す
-      gl.depthFunc(gl.LEQUAL);
+      // 近距离的物体会遮挡远距离的物体
+      gl!.depthFunc(gl!.LEQUAL);
 
       // カラーバッファや深度バッファをクリアする
-      gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+      // 清除颜色缓冲区和深度缓冲区
+      // gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+      gl!.clear(gl!.DEPTH_BUFFER_BIT);
 
-      gl.clearDepth(1.0);
+      gl!.clearDepth(1.0);
 
       // 透過設定
-      gl.enable(gl.BLEND);
-      gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+      gl!.enable(gl!.BLEND);
+      gl!.blendFunc(gl!.SRC_ALPHA, gl!.ONE_MINUS_SRC_ALPHA);
 
       // 描画更新
       this._view.render();
