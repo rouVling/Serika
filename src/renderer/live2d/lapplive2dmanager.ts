@@ -14,16 +14,22 @@ import { canvas } from './lappglmanager';
 import { LAppModel } from './lappmodel';
 import { LAppPal } from './lapppal';
 
-export let s_instance: LAppLive2DManager = null;
+export let s_instance: LAppLive2DManager | null | undefined = null;
 
 /**
  * サンプルアプリケーションにおいてCubismModelを管理するクラス
  * モデル生成と破棄、タップイベントの処理、モデル切り替えを行う。
+ * 
+ * 在示例应用程序中管理CubismModel的类
+ * 执行模型生成和销毁、触摸事件处理、模型切换。
  */
 export class LAppLive2DManager {
   /**
    * クラスのインスタンス（シングルトン）を返す。
    * インスタンスが生成されていない場合は内部でインスタンスを生成する。
+   * 
+   * 返回类的实例（单例）。
+   * 如果尚未创建实例，则在内部创建实例。
    *
    * @return クラスのインスタンス
    */
@@ -37,6 +43,8 @@ export class LAppLive2DManager {
 
   /**
    * クラスのインスタンス（シングルトン）を解放する。
+   * 
+   * 释放类的实例（单例）。
    */
   public static releaseInstance(): void {
     if (s_instance != null) {
@@ -52,7 +60,7 @@ export class LAppLive2DManager {
    * @param no モデルリストのインデックス値
    * @return モデルのインスタンスを返す。インデックス値が範囲外の場合はNULLを返す。
    */
-  public getModel(no: number): LAppModel {
+  public getModel(no: number): LAppModel | null {
     if (no < this._models.getSize()) {
       return this._models.at(no);
     }
@@ -74,13 +82,15 @@ export class LAppLive2DManager {
 
   /**
    * 画面をドラッグした時の処理
+   * 
+   * 当拖动屏幕时的处理
    *
    * @param x 画面のX座標
    * @param y 画面のY座標
    */
   public onDrag(x: number, y: number): void {
     for (let i = 0; i < this._models.getSize(); i++) {
-      const model: LAppModel = this.getModel(i);
+      const model: LAppModel = this.getModel(i)!;
 
       if (model) {
         model.setDragging(x, y);
@@ -181,6 +191,10 @@ export class LAppLive2DManager {
     // ModelDir[]に保持したディレクトリ名から
     // model3.jsonのパスを決定する。
     // ディレクトリ名とmodel3.jsonの名前を一致させておくこと。
+    // 
+    // 从ModelDir[]中保留的目录名中
+    // 确定model3.json的路径。
+    // 请确保目录名与model3.json的名称匹配。
     const model: string = LAppDefine.ModelDir[index];
     const modelPath: string = LAppDefine.ResourcesPath + model + '/';
     let modelJsonName: string = LAppDefine.ModelDir[index];
