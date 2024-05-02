@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>TypeScript HTML App</title>
+  <title>Serika App</title>
   <style>
     /* html, body {
         margin: 0;
@@ -27,10 +27,26 @@
     display: block;
     }
 
-    #live2d {
+    /* #live2d {
     flex-grow: 1;
+    } */
+    #dialog-container {
+      position: absolute;
+      top: 50%;
+      left: 0;
+      width: 100%;
+      height: calc(50% - 40px);
+      background-color: rgba(0, 0, 0, 0.5);
+      overflow-y: auto;
+      /* display: flex; */
+      flex-direction:column;
+      align-items: center;
+      justify-content: flex-end;  /* 将子组件排列在底部 */
     }
-
+    #dialog-text {
+      color: white;
+      font-size: 24px;
+    }
     #UserInput {
     width: 100%;
     /* height: 40px; */
@@ -45,8 +61,18 @@
 <body>
     <!-- test transparency -->
     <div id="live2d"></div>
+    <!-- <div id="dialog-container">
+        <p id="dialog-text">
+            test1
+        </p>
+        <p id="dialog-text">
+            test2
+        </p>
+    </div>
     <center>
         <input id="UserInput" type="text" value="test text">
-    </center>
+    </center> -->
+    <div id="root"></div>
+    <script type="module" src="/dialog/main.tsx"></script>
 </body>
 </html>
