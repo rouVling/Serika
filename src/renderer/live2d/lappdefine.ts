@@ -57,29 +57,39 @@ export const ModelDir: string[] = [
 export const ModelDirSize: number = ModelDir.length;
 
 // 外部定義ファイル（json）と合わせる
-export const MotionGroupIdle = 'Idle'; // アイドリング
-export const MotionGroupTapBody = 'TapBody'; // 体をタップしたとき
+// 外部定义文件（json）与之匹配
+export const MotionGroupIdle = 'Idle'; // アイドリング  // 空闲
+export const MotionGroupTapBody = 'TapBody'; // 体をタップしたとき  // 点击身体时
 
 // 外部定義ファイル（json）と合わせる
+// 外部定义文件（json）与之匹配
 export const HitAreaNameHead = 'Head';
 export const HitAreaNameBody = 'Body';
 
 // モーションの優先度定数
+// 动作优先级常数
 export const PriorityNone = 0;
 export const PriorityIdle = 1;
 export const PriorityNormal = 2;
 export const PriorityForce = 3;
 
 // MOC3の一貫性検証オプション
+// MOC3一致性验证选项
 export const MOCConsistencyValidationEnable = true;
 
 // デバッグ用ログの表示オプション
+// 调试用日志显示选项
 export const DebugLogEnable = true;
 export const DebugTouchLogEnable = false;
 
 // Frameworkから出力するログのレベル設定
+// 设置Framework输出的日志级别
 export const CubismLoggingLevel: LogLevel = LogLevel.LogLevel_Verbose;
 
 // デフォルトのレンダーターゲットサイズ
+// 默认的渲染目标大小
 export const RenderTargetWidth = 1900;
 export const RenderTargetHeight = 1000;
+
+export const ENABLE_LIMITED_FRAME_RATE = true;
+export const LIMITED_FRAME_RATE = 60;

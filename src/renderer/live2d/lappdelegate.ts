@@ -162,8 +162,17 @@ export class LAppDelegate {
       }
 
       // 時間更新
-      LAppPal.updateTime();
-      // LAppPal.printMessage('deltaTime: ' + LAppPal.getDeltaTime());
+      LAppPal.updateTime(false);
+      if (LAppDefine.ENABLE_LIMITED_FRAME_RATE) {
+        if (LAppPal.getDeltaTime() < 1 / LAppDefine.LIMITED_FRAME_RATE) {
+          requestAnimationFrame(loop);
+          return;
+        }
+      }
+
+      LAppPal.printMessage('deltaTime: ' + LAppPal.getDeltaTime());
+      LAppPal.updateTime(true);
+
 
       // 画面の初期化
       // 屏幕初始化
