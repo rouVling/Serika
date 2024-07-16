@@ -8,6 +8,14 @@ An Electron application with TypeScript
 
 - [VSCode](https://code.visualstudio.com/) + [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) + [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)
 
+## Run the project
+
+```bash
+npm run dev
+```
+
+you need to input your openai api key in the setting before chatting with the bot.
+
 ## Project Setup
 
 ### Install
