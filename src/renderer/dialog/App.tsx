@@ -31,6 +31,7 @@ export default function App(): JSX.Element {
 
   const [input, setInput] = React.useState<string>("")
 <<<<<<< HEAD
+<<<<<<< HEAD
 
   return (
     <input id="UserInput" type="text" value={input} onChange={(e) => setInput(e.target.value)}></input>
@@ -40,6 +41,9 @@ export default function App(): JSX.Element {
     {"content": "你好", "role": "user"},
     {"content": "你好，你是我爹", "role": "assistant"}
   ])
+=======
+  const [messages, setMessages] = React.useState<DialogMessage[]>([ ])
+>>>>>>> a1653aa (removed debug code)
   const [disableInput, setDisableInput] = React.useState<boolean>(false)
   const [voiceUrl, setVoiceUrl] = React.useState<string>("")
   const [replayVoice, setReplayVoice] = React.useState<boolean>(false)
