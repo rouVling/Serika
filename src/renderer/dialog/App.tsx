@@ -1,6 +1,3 @@
-<<<<<<< HEAD
-import React from "react"
-=======
 import React, { useEffect } from "react"
 import { DialogMessage } from "./types"
 import DialogBubble from "./components"
@@ -25,25 +22,11 @@ import { windowsStore } from "process"
 
 
 const lappmanager = LAppAdapter.getInstance()
->>>>>>> 4b0c62d (fixed bug, and modified css)
 
 export default function App(): JSX.Element {
 
   const [input, setInput] = React.useState<string>("")
-<<<<<<< HEAD
-<<<<<<< HEAD
-
-  return (
-    <input id="UserInput" type="text" value={input} onChange={(e) => setInput(e.target.value)}></input>
-    // <TextField id="UserInput" label="input" variant={"outlined"} sx={{color:"primary", height:"50%"}}/>
-=======
-  const [messages, setMessages] = React.useState<DialogMessage[]>([
-    {"content": "你好", "role": "user"},
-    {"content": "你好，你是我爹", "role": "assistant"}
-  ])
-=======
   const [messages, setMessages] = React.useState<DialogMessage[]>([ ])
->>>>>>> a1653aa (removed debug code)
   const [disableInput, setDisableInput] = React.useState<boolean>(false)
   const [voiceUrl, setVoiceUrl] = React.useState<string>("")
   const [replayVoice, setReplayVoice] = React.useState<boolean>(false)
@@ -222,6 +205,6 @@ export default function App(): JSX.Element {
       </center>
     </div>
   </>
->>>>>>> 4b0c62d (fixed bug, and modified css)
   )
 }
+

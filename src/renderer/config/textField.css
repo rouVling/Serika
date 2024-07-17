@@ -1,0 +1,33 @@
+:root {
+    --textfield-background-color: #292929;
+    --textfield-outline-color: #303030;
+    --textfield-bottom-border-color: #9a9a9a;
+    --textfield-active-color: #0078d7;
+    --textfield-active-background-color: #202020;
+    --textfield-hover-background-color: #323232;
+}
+
+input[type="text"] {
+  background-color: var(--textfield-background-color);
+  margin-right: 20px;
+  color: white;
+  border-style: none;
+  border: 1px solid var(--textfield-outline-color);
+  border-bottom: 1px solid;
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+  font-size: 1rem;
+  width: 40%;
+}
+
+input[type="text"]:hover {
+    background-color: var(--textfield-hover-background-color);
+}
+
+input[type="text"]:focus-visible {
+    outline: none;
+    border: 1px solid var(--textfield-active-background-color);
+    border-bottom: 1px solid var(--textfield-active-color);
+    background-color: var(--textfield-active-background-color);
+}
+

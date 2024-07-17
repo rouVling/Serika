@@ -42,3 +42,5 @@ $ npm run build:mac
 # For Linux
 $ npm run build:linux
 ```
+
+note: the repository is still in development, Framework will be changed into git submodule and live2d SDK will be removed soon.

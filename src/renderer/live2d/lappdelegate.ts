@@ -162,15 +162,14 @@ export class LAppDelegate {
       }
 
       // 時間更新
-      LAppPal.updateTime(false);
       if (LAppDefine.ENABLE_LIMITED_FRAME_RATE) {
+        LAppPal.updateTime(false);
         if (LAppPal.getDeltaTime() < 1 / LAppDefine.LIMITED_FRAME_RATE) {
           requestAnimationFrame(loop);
           return;
         }
       }
 
-      LAppPal.printMessage('deltaTime: ' + LAppPal.getDeltaTime());
       LAppPal.updateTime(true);
 
 

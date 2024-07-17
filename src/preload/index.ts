@@ -1,8 +1,19 @@
-import { contextBridge } from 'electron'
+import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
+import { get } from 'http'
 
 // Custom APIs for renderer
-const api = {}
+const api = {
+  getScreenShot: () => ipcRenderer.invoke('get-screen-shot'),
+  ping: () => ipcRenderer.send('ping'),
+  openConfigWindow: () => ipcRenderer.send('open-config-window'),
+  getStore: (key: string) => ipcRenderer.invoke('getStore', key),
+  setStore: (key: string, value: any) => ipcRenderer.send('setStore', key, value),
+  // getScreenShotResult: () => ipcRenderer.invoke('get-screen-shot-result'),
+
+  onUpdateScreenShotResult: (callback: (value: string) => void) => ipcRenderer.on('update-screen-shot-result', (_, value) => callback(value)),
+  onUpdateApikey: (callback: (value: string) => void) => ipcRenderer.on('update-apikey', (_, value) => callback(value))
+}
 
 // Use `contextBridge` APIs to expose Electron APIs to
 // renderer only if context isolation is enabled, otherwise

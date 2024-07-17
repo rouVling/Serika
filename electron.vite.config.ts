@@ -4,10 +4,18 @@ import react from '@vitejs/plugin-react'
 
 export default defineConfig({
   main: {
-    plugins: [externalizeDepsPlugin()]
+    plugins: [externalizeDepsPlugin()],
+    build: {
+      rollupOptions: {
+        input: {
+          index: resolve(__dirname, 'src/main/index.ts'),
+          config: resolve(__dirname, 'src/main/config.ts')
+        }
+      }
+    },
   },
   preload: {
-    plugins: [externalizeDepsPlugin()]
+    plugins: [externalizeDepsPlugin()],
   },
   renderer: {
     resolve: {
@@ -16,6 +24,14 @@ export default defineConfig({
         '@framework': resolve('src/renderer/Framework/src'),
       }
     },
-    plugins: [react()]
-  }
+    build: {
+      rollupOptions: {
+        input: {
+          index: resolve(__dirname, 'src/renderer/index.html'),
+          config: resolve(__dirname, 'src/renderer/config.html')
+        }
+      }
+    },
+    plugins: [react()],
+  },
 })
