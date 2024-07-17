@@ -2,7 +2,8 @@ export interface DialogMessage {
   content: string,
   role: "user" | "assistant" | "system",
   voiceUrl? : undefined | string | HTMLAudioElement,
-  voiceType?: "string" | "element"
+  voiceType?: "string" | "element",
+  img?: string
 }
 
 export interface GPTResponse {

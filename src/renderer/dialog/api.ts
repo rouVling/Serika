@@ -85,15 +85,18 @@ export function getResponseGPT(msgs: DialogMessage[], api_key: string, prompt?: 
   })
 }
 
-export function getResponseGemini(msgs: DialogMessage[], api_key: string, prompt?: string): Promise<string> {
+export function getResponseGemini(msgs: DialogMessage[], api_key: string, prompt?: string, saveTokenMode: boolean = true): Promise<string> {
   return new Promise((resolve, reject) => {
+
+    const contents = prompt ? [{ content: prompt, role: "user" }, ...msgs] : msgs
+
     fetch("https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent" + "?key=" + api_key, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        contents: (prompt? [{ content: prompt, role: "user" }, ...msgs] : msgs).map(( message) => {
+        contents: contents.map((message, index) => {
           return {
             role: (() => {
               switch (message.role) {
@@ -105,7 +108,9 @@ export function getResponseGemini(msgs: DialogMessage[], api_key: string, prompt
                   return "user"
               }
             })(),
-            parts: [{text: message.content}]
+            parts: (message as DialogMessage).img ? (
+              ((saveTokenMode && index === contents.length - 1) || !saveTokenMode) ? [{ text: message.content }, { inlineData: { mimeType: "image/png", data: (message as DialogMessage).img } }] : [{ text: message.content }]
+            ) : [{ text: message.content }]
           }
         })
 

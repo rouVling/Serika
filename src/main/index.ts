@@ -56,15 +56,24 @@ function createWindow(): void {
 
   const screenshot = new Screenshots()
   screenshot.on("ok", (e, buffer, bounds) => {
-    const picture = "data:image/png;base64," + getBase64(buffer)
-    mainWindow.webContents.send('update-screen-shot-result', picture)
+    // const picture = "data:image/png;base64," + getBase64(buffer)
+    mainWindow.webContents.send('update-screen-shot-result', getBase64(buffer))
+    mainWindow.show()
   })
+
+  screenshot.on("cancel", () => {
+    mainWindow.show()
+  })
+
 
   ipcMain.on("setStore", (event, key, value) => {
     store.set(key, value)
     switch (key) {
       case "apikey":
         mainWindow.webContents.send('update-apikey', value)
+        break
+      case "tokenSaveMode":
+        mainWindow.webContents.send('update-tokenSaveMode', value)
         break
     }
   })

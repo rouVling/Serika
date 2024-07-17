@@ -12,7 +12,8 @@ const api = {
   // getScreenShotResult: () => ipcRenderer.invoke('get-screen-shot-result'),
 
   onUpdateScreenShotResult: (callback: (value: string) => void) => ipcRenderer.on('update-screen-shot-result', (_, value) => callback(value)),
-  onUpdateApikey: (callback: (value: string) => void) => ipcRenderer.on('update-apikey', (_, value) => callback(value))
+  onUpdateApikey: (callback: (value: string) => void) => ipcRenderer.on('update-apikey', (_, value) => callback(value)),
+  onUpdateTokenSaveMode: (callback: (value: string) => void) => ipcRenderer.on('update-tokenSaveMode', (_, value) => callback(value))
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to

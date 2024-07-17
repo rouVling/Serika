@@ -11,6 +11,8 @@ modified to fit the project
   /* margin-bottom: 1rem; */
   width: 100%;
   height: 40%;
+  pointer-events: none;
+  /* height: 0px; */
   /* display: flex; */
   /* flex-direction: row; */
   /* justify-content: space-between; */
@@ -86,3 +88,7 @@ modified to fit the project
 }
 .toggle input:checked + div:after { content: attr(data-on); }
 /* input:focus + div:after { text-decoration: underline; } */
+
+.toggle input {
+  pointer-events: none;
+}

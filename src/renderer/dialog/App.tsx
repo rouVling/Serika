@@ -33,13 +33,16 @@ export default function App(): JSX.Element {
   const [hideChat, setHideChat] = React.useState<boolean>(false)
   const [expTimer, setExpTimer] = React.useState<ExponentialTimer | null>(null)
   const [img, setImg] = React.useState<string>("")
+
   const [apikey, setApikey] = React.useState<string>("")
+  const [tokenSaveMode, setTokenSaveMode] = React.useState<boolean>(true)
 
   // IPC event listeners
 
   useEffect(() => {
     window.api.onUpdateScreenShotResult((value: string) => {
       setImg(value)
+      // console.log(value)
     })
     return () => {
       window.api.onUpdateScreenShotResult(() => { })
@@ -52,6 +55,15 @@ export default function App(): JSX.Element {
     })
     return () => {
       window.api.onUpdateApikey(() => { })
+    }
+  }, [])
+
+  useEffect(() => {
+    window.api.onUpdateTokenSaveMode((value: boolean) => {
+      setTokenSaveMode(value)
+    })
+    return () => {
+      window.api.onUpdateTokenSaveMode(() => { })
     }
   }, [])
 
@@ -119,14 +131,16 @@ export default function App(): JSX.Element {
         setInput("")
         return
       }
-      setMessages((prev) => [...prev, { content: input, role: "user" }])
+      setMessages((prev) => [...prev, { content: input, role: "user", img: img === "" ? undefined : img }])
+      // console.log(img)
       // console.log(messages)  // not updated yet
 
       getResponseGPT([...messages, { content: input, role: "user" }], apikey).then((response) => {
         // getResponseGemini(
-        //   [...messages, { content: input, role: "user" }],
+        //   (img === "")? [...messages, { content: input, role: "user" }]: [...messages, { content: input, role: "user", img:img }],
         //   apikey,
-        //   "你是一个桌面萌宠内置的AI，你需要给用户陪伴与亲密。在用户与你对话的时候，请使用尽可能简短的回答进行对话。请不要在回答中出现英文。如果需要使用，请使用其他表达方式替代，请不要使用 markdown 标记"
+        //   "你是一个桌面萌宠内置的AI，你需要给用户陪伴与亲密。在用户与你对话的时候，请使用尽可能简短的回答进行对话。请不要在回答中出现英文。如果需要使用，请使用其他表达方式替代，请不要使用 markdown 标记",
+        //   tokenSaveMode
         // ).then((response) => {
 
         getVoiceLocal(response).then((url) => {
@@ -140,6 +154,7 @@ export default function App(): JSX.Element {
       }).catch((err) => { console.log(err) })
 
       setInput("")
+      setImg("")
     }
   }
 
@@ -147,7 +162,7 @@ export default function App(): JSX.Element {
     <center>
       <div id="dialog-container" hidden={hideChat}>
         {
-          img !== "" ? <img src={img} style={{ width: "inherit", borderRadius: "5px" }} /> : <></>
+          img !== "" ? <img src={"data:image/png;base64," + img} style={{ width: "inherit", borderRadius: "5px" }} /> : <></>
         }
         {
           messages.map((message, index) => {
@@ -179,7 +194,7 @@ export default function App(): JSX.Element {
 
           <button className="miniButton" onClick={ () => window.api.getScreenShot() }><ScreenshotMonitorIcon /></button>
 
-          <button className="miniButton" onClick={() => { setMessages(() => []) }}><DeleteIcon /></button>
+          <button className="miniButton" onClick={() => { setMessages(() => []); setImg("") }}><DeleteIcon /></button>
 
           <button className="miniButton" id="settingButton" onClick={
             () => { window.api.openConfigWindow() } }> <SettingsIcon /> </button>

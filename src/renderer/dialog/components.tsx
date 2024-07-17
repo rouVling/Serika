@@ -6,12 +6,17 @@ import VolumeUpIcon from '@mui/icons-material/VolumeUp';
 export default function DialogBubble(props: DialogMessage): JSX.Element {
   // if (props.role === "user") {
   if (props.role === "user") {
-  // if (props.role === "assistant") {
-    return <Paper className="dialogBubble userBubble" sx={{backgroundColor:"rgba(50, 50, 100, 0.5)", color: "rgb(200, 200, 200)", borderRadius:"10px"}}> {props.content}</Paper>
+    // if (props.role === "assistant") {
+    return <Paper className="dialogBubble userBubble" sx={{ backgroundColor: "rgba(50, 50, 100, 0.5)", color: "rgb(200, 200, 200)", borderRadius: "10px" }}>
+      <div>
+        {props.img ? <img src={"data:image/png;base64," + props.img} /> : undefined}
+        {props.content}
+      </div>
+    </Paper>
   }
 
   else if (props.role === "assistant") {
-    return <Paper className="dialogBubble assistantBubble" sx={{backgroundColor:"rgba(150, 50, 200, 0.5)",color:"rgb(200, 200, 200)", borderRadius:"10px" }} >{props.content}{props.voiceUrl? <VolumeUpIcon onClick={()=>{
+    return <Paper className="dialogBubble assistantBubble" sx={{ backgroundColor: "rgba(150, 50, 200, 0.5)", color: "rgb(200, 200, 200)", borderRadius: "10px" }} >{props.content}{props.voiceUrl ? <VolumeUpIcon onClick={() => {
       // play voice
       if (props.voiceType === "string") {
         const audio = new Audio(props.voiceUrl as string)
@@ -22,9 +27,9 @@ export default function DialogBubble(props: DialogMessage): JSX.Element {
       else if (props.voiceType === "element") {
         (props.voiceUrl as HTMLAudioElement).play()
       }
-    }}/>: undefined}</Paper>
-  }else {
-    return <Paper sx={{display: "flex", justifyContent: "center"}}>{props.content}</Paper>
+    }} /> : undefined}</Paper>
+  } else {
+    return <Paper sx={{ display: "flex", justifyContent: "center" }}>{props.content}</Paper>
   }
 }
 

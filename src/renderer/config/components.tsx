@@ -38,7 +38,7 @@ export function TextItemPart(props: TextItemPartProps) {
 export function BoolItem(props: ConfigItemProps) {
   return <div className="rightContainerItem">
     <TextItemPart icon={props.icon} mainText={props.mainText} description={props.description} />
-    <div style={{width: "50px", height: "50px", paddingRight: "60px"}} onClick={() => props.callback()}>
+    <div style={{width: "50px", height: "50px", paddingRight: "60px"}} onClick={() => { props.callback(!props.content)}}>
       <label className="toggle">
         <input type="checkbox" hidden checked={props.content} />
         <div data-off="关闭" data-on="开启">Notification</div>
