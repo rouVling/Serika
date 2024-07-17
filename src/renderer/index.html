@@ -1,64 +1,194 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Serika App</title>
   <style>
-    /* html, body {
-        margin: 0;
-        overflow: hidden;
+    :root {
+      --primary-color: #292929;
+      /* --primary-color: rgba(30, 30, 30) */
+      --line-grey: #414141;
+      --secondary-color: #cecece;
+      --theme-color: #76b9ed;
     }
-    canvas {
-        width: 100vw;
-        height: 100vh;
-        display: block;
-    } */
-    html, body {
-    margin: 0;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
+
+    html,
+    body {
+      margin: 0;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
     }
 
     canvas {
+<<<<<<< HEAD
     width: 100vw;
     height: calc(100vh - 40px);  /* 减去 input 组件的高度 */
     display: block;
+=======
+      width: 100vw;
+      height: calc(100vh - 60px);
+      /* 减去 input 组件的高度 */
+      display: block;
+>>>>>>> 84ab4a3 (modified css)
     }
 
     /* #live2d {
     flex-grow: 1;
     } */
     #dialog-container {
+<<<<<<< HEAD
       position: absolute;
       top: 50%;
       left: 0;
       width: 100%;
       height: calc(50% - 40px);
       background-color: rgba(0, 0, 0, 0.5);
+=======
+      /* position: absolute; */
+      /* top: calc(50vh + 10px); */
+      /* top: calc(30vh); */
+      left: 5%;
+      width: 90%;
+      height: calc(70vh - 60px);
+      margin-top: calc(-70vh + 60px);
+      /* background: linear-gradient(rgba(0, 0, 255, 0), rgba(67, 64, 79, 0.6)); */
+      /* background: linear-gradient(rgba(0, 0, 0, 0), rgb(41, 41, 41, 0.6)); */
+      /* background: linear-gradient(rgba(0, 0, 0, 0), rgb(41, 41, 41, 0.8)); */
+      background: linear-gradient(rgba(0, 0, 0, 0), rgba(118, 185, 237, 0.1));
+>>>>>>> 84ab4a3 (modified css)
       overflow-y: auto;
       /* display: flex; */
-      flex-direction:column;
+      flex-direction: column;
       align-items: center;
+<<<<<<< HEAD
       justify-content: flex-end;  /* 将子组件排列在底部 */
+=======
+      justify-content: flex-end;
+      /* 将子组件排列在底部 */
+      /* pointer-events: none; */
+>>>>>>> 84ab4a3 (modified css)
     }
+
     #dialog-text {
       color: white;
       font-size: 24px;
     }
+
     #UserInput {
+<<<<<<< HEAD
     width: 100%;
     /* height: 40px; */
     margin: 0 auto;
     }
+=======
+      width: 90%;
+      height: 2em;
+      border-radius: 5px;
+      border: solid 1px var(--line-grey);
+      margin: 0 auto;
+      /* background-color: rgba(195, 201, 255, 0.671); */
+      /* backdrop-filter: blur(14px) saturate(150%); */
+      /* background-color: var(--primary-color); */
+      background-color: rgba(30, 30, 30, 0.8);
+      color: white;
+      backdrop-filter: blur(3px);
+    }
+
+    #UserInput:focus {
+      border-color: #76b9ed;
+      outline: none;
+    }
+
+    #dragBar {
+      min-height: 10px;
+    }
+
+    #buttonGroup {
+      width: 95%;
+      margin-top: -40px;
+      height: 40px;
+      display: flex;
+      flex-direction: row;
+      justify-content: flex-end;
+      align-items: center;
+    }
+
+    .miniButton {
+      height: 30px;
+      /* background-color: rgba(195, 201, 255, 0.671); */
+      /* background-color: var(--primary-color); */
+      background-color: rgba(30, 30, 30, 0.8);
+        color: white;
+        border: solid 1px var(--line-grey);
+        border-radius: 5px;
+        align-self: flex-end;
+        margin: 2px;
+    }
+  
+    .miniButton:hover {
+      background-color: rgba(45, 45, 45, 0.8)
+    }
+
+    .miniButton svg {
+      width: 70%;
+    }
+
+    #settingButton svg {
+      transform-style: preserve-3d;
+      transition: 0.5s;
+      transform: rotateZ(0deg);
+    }
+
+    #settingButton:hover svg {
+      transform: rotateZ(90deg);
+    }
+
+    #hideChatButton svg {
+      /* justify-self: left; */
+      transform-style: preserve-3d;
+      transition: 0.5s;
+    }
+
+    #hideChatButton svg{
+      width: 100%;
+      margin-top: 2px;
+    }
+
+    .dialogBubble {
+      display: flex;
+      margin: 3px;
+      padding: 3px;
+      /* border-radius: 10px; */
+      pointer-events: none;
+      line-break: anywhere;
+      /* border: solid 1px var(--line-grey); */
+    }
+
+    .userBubble {
+      justify-content: flex-end;
+      margin-left: 30%;
+      margin-right: 10px;
+    }
+
+    .assistantBubble {
+      justify-content: flex-start;
+      margin-right: 30%;
+      margin-left: 10px;
+    }
+
+>>>>>>> 84ab4a3 (modified css)
   </style>
   <!-- Live2DCubismCore script -->
-  <script src = "/Core/live2dcubismcore.js"></script>
+  <script src="/Core/live2dcubismcore.js"></script>
   <!-- Build script -->
-  <script src = "/live2d/main.ts" type="module"></script>
+  <script src="/live2d/main.ts" type="module"></script>
 </head>
+
 <body>
+<<<<<<< HEAD
     <!-- test transparency -->
     <div id="live2d"></div>
     <!-- <div id="dialog-container">
@@ -74,5 +204,12 @@
     </center> -->
     <div id="root"></div>
     <script type="module" src="/dialog/main.tsx"></script>
+=======
+  <div id="dragBar" style="-webkit-app-region: drag"></div>
+  <div id="live2d"></div>
+  <div id="root"></div>
+  <script type="module" src="/dialog/main.tsx"></script>
+>>>>>>> 84ab4a3 (modified css)
 </body>
+
 </html>
