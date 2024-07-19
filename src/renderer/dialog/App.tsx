@@ -26,7 +26,7 @@ const lappmanager = LAppAdapter.getInstance()
 export default function App(): JSX.Element {
 
   const [input, setInput] = React.useState<string>("")
-  const [messages, setMessages] = React.useState<DialogMessage[]>([ ])
+  const [messages, setMessages] = React.useState<DialogMessage[]>([])
   const [disableInput, setDisableInput] = React.useState<boolean>(false)
   const [voiceUrl, setVoiceUrl] = React.useState<string>("")
   const [replayVoice, setReplayVoice] = React.useState<boolean>(false)
@@ -82,6 +82,8 @@ export default function App(): JSX.Element {
     }
   }, [voiceUrl, replayVoice])
 
+  // JavaScript event listeners
+
   useEffect(() => {
     // automatically scroll to the bottom
     const dialogContainer = document.getElementById("dialog-container")
@@ -90,6 +92,22 @@ export default function App(): JSX.Element {
       dialogContainer.scrollTo({ top: dialogContainer.scrollHeight, behavior: "smooth" })
     }
   }, [messages])
+
+  useEffect(() => {
+    const dragBar = document.getElementById("dragBar")
+    dragBar?.addEventListener("pointerover" , () => {
+    // console.log("enable touching")
+      setIgnoreMouseEvent(false)
+    })
+    dragBar?.addEventListener("pointerout", () => {
+    // console.log("disable touching")
+      setIgnoreMouseEvent(true)
+    })
+    return () => {
+      dragBar?.removeEventListener("pointerover", () => { })
+      dragBar?.removeEventListener("pointerout", () => { })
+    }
+  }, [])
 
   useEffect(() => {
     const expTimer = new ExponentialTimer(() => {
@@ -135,13 +153,14 @@ export default function App(): JSX.Element {
       // console.log(img)
       // console.log(messages)  // not updated yet
 
-      getResponseGPT([...messages, { content: input, role: "user" }], apikey).then((response) => {
-        // getResponseGemini(
-        //   (img === "")? [...messages, { content: input, role: "user" }]: [...messages, { content: input, role: "user", img:img }],
-        //   apikey,
-        //   "你是一个桌面萌宠内置的AI，你需要给用户陪伴与亲密。在用户与你对话的时候，请使用尽可能简短的回答进行对话。请不要在回答中出现英文。如果需要使用，请使用其他表达方式替代，请不要使用 markdown 标记",
-        //   tokenSaveMode
-        // ).then((response) => {
+      // getResponseGPT([...messages, { content: input, role: "user" }], apikey).then((response) => {
+      getResponseGemini(
+        (img === "") ? [...messages, { content: input, role: "user" }] : [...messages, { content: input, role: "user", img: img }],
+        apikey,
+        // "你是一个桌面萌宠内置的AI，你需要给用户陪伴与亲密。在用户与你对话的时候，请使用尽可能简短的回答进行对话。请不要在回答中出现英文。如果需要使用，请使用其他表达方式替代，请不要使用 markdown 标记",
+        undefined,
+        tokenSaveMode
+      ).then((response) => {
 
         getVoiceLocal(response).then((url) => {
           setVoiceUrl(url)
@@ -158,9 +177,18 @@ export default function App(): JSX.Element {
     }
   }
 
+  const setIgnoreMouseEvent = (ignore: boolean) => {
+    window.api.setIgnoreMouseEvent(ignore)
+  }
+
   return (<>
     <center>
-      <div id="dialog-container" hidden={hideChat}>
+      <div
+        id="dialog-container"
+        hidden={hideChat}
+        onPointerOver={() => { setIgnoreMouseEvent(false) }}
+        onPointerOut={() => { setIgnoreMouseEvent(true) }}
+      >
         {
           img !== "" ? <img src={"data:image/png;base64," + img} style={{ width: "inherit", borderRadius: "5px" }} /> : <></>
         }
@@ -188,24 +216,54 @@ export default function App(): JSX.Element {
     <div id="inputContainer">
       <center>
         <div id="buttonGroup">
-          <button className="miniButton" id="hideChatButton" onClick={() => { setHideChat(!hideChat) }} ><ArrowDropDownIcon style={{
-            transform: "rotateX(" + (hideChat ? "0deg" : "180deg"),
-          }}/></button>
+          <button
+            className="miniButton"
+            id="hideChatButton"
+            onClick={() => { setHideChat(!hideChat) }}
+            onPointerOver={() => { setIgnoreMouseEvent(false) }}
+            onPointerOut={() => { setIgnoreMouseEvent(true) }}
+          >
+            <ArrowDropDownIcon style={{
+              transform: "rotateX(" + (hideChat ? "0deg" : "180deg"),
+            }} />
+          </button>
 
-          <button className="miniButton" onClick={ () => window.api.getScreenShot() }><ScreenshotMonitorIcon /></button>
+          <button
+            className="miniButton"
+            onClick={() => window.api.getScreenShot()}
+            onPointerOver={() => { setIgnoreMouseEvent(false) }}
+            onPointerOut={() => { setIgnoreMouseEvent(true) }}
+          > <ScreenshotMonitorIcon />
+          </button>
 
-          <button className="miniButton" onClick={() => { setMessages(() => []); setImg("") }}><DeleteIcon /></button>
 
-          <button className="miniButton" id="settingButton" onClick={
-            () => { window.api.openConfigWindow() } }> <SettingsIcon /> </button>
+          <button
+            className="miniButton"
+            onClick={() => { setMessages(() => []); setImg("") }}
+            onPointerOver={() => { setIgnoreMouseEvent(false) }}
+            onPointerOut={() => { setIgnoreMouseEvent(true) }}
+          > <DeleteIcon />
+          </button>
 
-          {/* <button className="miniButton" onClick={
-             () => {
-              // console.log(lappmanager.getMotionGroups())
-              // console.log(lappmanager.getMotionGroups())
-              // lappmanager.startMotion(lappmanager.getMotionGroups()[0], 0, 1)
-            // () => lappmanager.startMotion("Idle", 3, 1)
-             } }><QuestionMarkIcon /></button> */}
+          <button
+            className="miniButton"
+            id="settingButton"
+            onClick={() => { window.api.openConfigWindow() }}
+            onPointerOver={() => { setIgnoreMouseEvent(false) }}
+            onPointerOut={() => { setIgnoreMouseEvent(true) }}
+          > <SettingsIcon /> </button>
+
+          <button className="miniButton"
+            onPointerOver={() => { setIgnoreMouseEvent(false) }}
+            onPointerOut={() => { setIgnoreMouseEvent(true) }}
+            onClick={
+              () => {
+                console.log(lappmanager.getMotionGroups())
+                console.log(lappmanager.getMotionGroups())
+                lappmanager.nextScene()
+                // lappmanager.startMotion(lappmanager.getMotionGroups()[0], 0, 1)
+                // () => lappmanager.startMotion("Idle", 3, 1)
+              }}><QuestionMarkIcon /></button>
         </div>
         {/* <Paper> */}
         <input
@@ -215,6 +273,8 @@ export default function App(): JSX.Element {
           onChange={(e) => { setInput(e.target.value); }}
           onKeyDown={handleEnter}
           disabled={disableInput}
+          onPointerOver={() => { setIgnoreMouseEvent(false) }}
+          onPointerOut={() => { setIgnoreMouseEvent(true) }}
         ></input>
         {/* </Paper> */}
       </center>

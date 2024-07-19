@@ -50,5 +50,9 @@ export class LAppAdapter {
     return this.getModel()?.startMotion(group, no, priority, onFinishedMotionHandler) ?? InvalidMotionQueueEntryHandleValue;
   }
 
+  public nextScene(): void {
+    this.getMgr().nextScene();
+  }
+
   // private _live2DMgr: LAppLive2DManager;
 }

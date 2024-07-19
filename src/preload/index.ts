@@ -9,6 +9,8 @@ const api = {
   openConfigWindow: () => ipcRenderer.send('open-config-window'),
   getStore: (key: string) => ipcRenderer.invoke('getStore', key),
   setStore: (key: string, value: any) => ipcRenderer.send('setStore', key, value),
+  setIgnoreMouseEvent: (ignore: boolean) => ipcRenderer.send('setIgnoreMouseEvent', ignore),
+  setEnableClickThrough: (enable: boolean) => ipcRenderer.send('setEnableClickThrough', enable),
   // getScreenShotResult: () => ipcRenderer.invoke('get-screen-shot-result'),
 
   onUpdateScreenShotResult: (callback: (value: string) => void) => ipcRenderer.on('update-screen-shot-result', (_, value) => callback(value)),

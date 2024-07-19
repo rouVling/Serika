@@ -8,6 +8,7 @@ import { Provider } from 'electron-updater'
 import Store from 'electron-store'
 
 const store = new Store()
+let enableClickThrough = store.get("enableClickThrough") ?? false
 
 function createWindow(): void {
   // Create the browser window.
@@ -21,6 +22,7 @@ function createWindow(): void {
     titleBarStyle: 'hiddenInset',
     alwaysOnTop: true,
     frame: false,
+    resizable: false,
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
       // TODO: 为了方便开发，暂时关闭了 webSecurity，后续需要根据实际情况开启
@@ -32,13 +34,14 @@ function createWindow(): void {
 
   // 窗口放在右下角，在菜单栏上
   const { width, height } = screen.getPrimaryDisplay().workAreaSize
-  const [ windowWidth, windowHeight ] = mainWindow.getSize(); 
+  const [windowWidth, windowHeight] = mainWindow.getSize();
   mainWindow.setPosition(width - windowWidth, height - windowHeight);
 
   // mainWindow.setPosition(0, 0);
 
   mainWindow.on('ready-to-show', () => {
     mainWindow!.show()
+    // mainWindow.setIgnoreMouseEvents(false, {forward: true})
   })
 
   mainWindow.webContents.setWindowOpenHandler((details) => {
@@ -77,6 +80,19 @@ function createWindow(): void {
         break
     }
   })
+
+  ipcMain.on("setEnableClickThrough", (event, enable: boolean) => {
+    enableClickThrough = enable
+    if(enable == false) {
+      mainWindow.setIgnoreMouseEvents(false, { forward: true })
+    }
+  })
+
+  ipcMain.on("setIgnoreMouseEvent", (event, ignore: boolean) => {
+    if (enableClickThrough) {
+      mainWindow.setIgnoreMouseEvents(ignore, { forward: true })
+    }
+  })
 }
 
 // This method will be called when Electron has finished
@@ -101,7 +117,7 @@ app.whenReady().then(() => {
 
   ipcMain.handle('get-screen-shot', () => {
     return screenshot.startCapture()
- })
+  })
 
   ipcMain.on('open-config-window', () => {
     createConfigWindow()
@@ -133,28 +149,27 @@ ipcMain.handle("getStore", (event, key) => {
   return store.get(key)
 })
 
-function getBase64(unit8Array)
-{
-let keyStr = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
-var output = "";
-var chr1, chr2, chr3, enc1, enc2, enc3, enc4;
-var i = 0;
-while (i < unit8Array.length) {
-chr1 = unit8Array[i++];
-chr2 = unit8Array[i++];
-chr3 = unit8Array[i++];
+function getBase64(unit8Array) {
+  let keyStr = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
+  var output = "";
+  var chr1, chr2, chr3, enc1, enc2, enc3, enc4;
+  var i = 0;
+  while (i < unit8Array.length) {
+    chr1 = unit8Array[i++];
+    chr2 = unit8Array[i++];
+    chr3 = unit8Array[i++];
 
-        enc1 = chr1 >> 2;
-        enc2 = (chr1 & 3) << 4 | chr2 >> 4;
-        enc3 = (chr2 & 15) << 2 | chr3 >> 6;
-        enc4 = chr3 & 63;
+    enc1 = chr1 >> 2;
+    enc2 = (chr1 & 3) << 4 | chr2 >> 4;
+    enc3 = (chr2 & 15) << 2 | chr3 >> 6;
+    enc4 = chr3 & 63;
 
-        if (isNaN(chr2)) {
-            enc3 = enc4 = 64;
-        } else if (isNaN(chr3)) {
-            enc4 = 64;
-        }
-        output = output + keyStr.charAt(enc1) + keyStr.charAt(enc2) + keyStr.charAt(enc3) + keyStr.charAt(enc4);
+    if (isNaN(chr2)) {
+      enc3 = enc4 = 64;
+    } else if (isNaN(chr3)) {
+      enc4 = 64;
     }
-    return output;
+    output = output + keyStr.charAt(enc1) + keyStr.charAt(enc2) + keyStr.charAt(enc3) + keyStr.charAt(enc4);
+  }
+  return output;
 }

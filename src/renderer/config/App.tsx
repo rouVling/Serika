@@ -9,6 +9,7 @@ import SecurityIcon from '@mui/icons-material/Security';
 import ChatBubbleIcon from '@mui/icons-material/ChatBubble';
 import SettingsIcon from '@mui/icons-material/Settings';
 import WalletIcon from '@mui/icons-material/Wallet';
+import AdsClickIcon from '@mui/icons-material/AdsClick';
 
 export default function App() {
 
@@ -18,6 +19,7 @@ export default function App() {
 
   const [activeChat, setActiveChat] = useState(false)
   const [apikey, setApikey] = useState("")
+  const [enableClickThrough, setEnableClickThrough] = useState(false)
   const [tokenSaveMode, setTokenSaveMode] = useState(true)
 
   const [tabNum, setTabNum] = useState(0)
@@ -32,6 +34,12 @@ export default function App() {
   useEffect(() => {
     window.api.getStore("tokenSaveMode").then((value: boolean) => {
       setTokenSaveMode(value === undefined? true: value)
+    })
+  }, [])
+
+  useEffect(() => {
+    window.api.getStore("enableClickThrough").then((value: boolean) => {
+      setEnableClickThrough(value === undefined? false: value)
     })
   }, [])
 
@@ -59,7 +67,9 @@ export default function App() {
     </div>
     <div id="rightContainer" >
       <div hidden={tabNum !== 0}>
-        <div className="rightContainerTitle">API 设置</div>
+        <div className="rightContainerTitle">通用设置</div>
+        <BoolItem icon={<AdsClickIcon />} mainText="启用点击穿透" description="聊天框点击不穿透; 模型 hitArea 缺失会导致穿透面积增大; 点击穿透后无法拖动窗口 (待修复) " type="bool" callback={ (val) => {setEnableClickThrough(val); window.api.setStore("enableClickThrough", val); window.api.setEnableClickThrough(val) }} content={enableClickThrough} />
+
         <BoolItem icon={<WalletIcon />} mainText="发送图片时节省 token" description="开启后发送图片时不发送历史聊天图片" type="bool" callback={(val) => { setTokenSaveMode(val); window.api.setStore("tokenSaveMode", val) }} content={tokenSaveMode} />
 
         {/* <TextFieldItem icon={<KeyIcon />} mainText="API Key" description="API Key 用于访问 GPT-SoVits 服务" type="input" callback={(val) => { }} content={apiKey} /> */}

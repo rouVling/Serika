@@ -97,13 +97,13 @@
       /* background-color: rgba(195, 201, 255, 0.671); */
       /* background-color: var(--primary-color); */
       background-color: rgba(30, 30, 30, 0.8);
-        color: white;
-        border: solid 1px var(--line-grey);
-        border-radius: 5px;
-        align-self: flex-end;
-        margin: 2px;
+      color: white;
+      border: solid 1px var(--line-grey);
+      border-radius: 5px;
+      align-self: flex-end;
+      margin: 2px;
     }
-  
+
     .miniButton:hover {
       background-color: rgba(45, 45, 45, 0.8)
     }
@@ -128,7 +128,7 @@
       transition: 0.5s;
     }
 
-    #hideChatButton svg{
+    #hideChatButton svg {
       width: 100%;
       margin-top: 2px;
     }
@@ -168,6 +168,29 @@
       /* max-height: 50%; */
       object-fit: cover;
     }
+
+    div#dragBar {
+      /* background-color: var(--primary-color); */
+      height: 10px;
+      width: 10px;
+      border: solid 5px var(--primary-color);
+      border-right: solid 5px transparent;
+      border-bottom: solid 5px transparent;
+      cursor: move;
+      /* background-color: var(--theme-color) */
+    }
+
+    div#dragBarEdge {
+      /* margin-top: 10%; */
+      /* margin-bottom: -10%; */
+      /* margin-left: 5%; */
+      height: 20px;
+      width: 20px;
+      border: solid 1px var(--line-grey);
+      border-right: none;
+      border-bottom: none;
+      cursor: move;
+    }
   </style>
   <!-- Live2DCubismCore script -->
   <script src="/Core/live2dcubismcore.js"></script>
@@ -176,7 +199,9 @@
 </head>
 
 <body>
-  <div id="dragBar" style="-webkit-app-region: drag"></div>
+  <div id="dragBarEdge" style="-webkit-app-region: drag">
+    <div id="dragBar" style="-webkit-app-region: drag"></div>
+  </div>
   <div id="live2d"></div>
   <div id="root"></div>
   <script type="module" src="/dialog/main.tsx"></script>

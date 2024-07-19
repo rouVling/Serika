@@ -778,6 +778,21 @@ export class LAppModel extends CubismUserModel {
     return false;
   }
 
+  public anyhitTest(x: number, y: number): boolean {
+    if (this._opacity < 1) {
+      return false;
+    }
+
+    const count: number = this._modelSetting.getHitAreasCount();
+    for (let i = 0; i < count; i++) {
+        const drawId: CubismIdHandle = this._modelSetting.getHitAreaId(i);
+        if (this.isHit(drawId, x, y)) {
+            return true;
+      }
+    }
+    return false;
+  }
+
   /**
    * モーションデータをグループ名から一括でロードする。
    * モーションデータの名前は内部でModelSettingから取得する。

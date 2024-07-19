@@ -27,7 +27,7 @@ export class LAppView {
   constructor() {
     this._programId = null;
     this._back = null;
-    this._gear = null;
+    // this._gear = null;
 
     // タッチ関係のイベント管理
     this._touchManager = new TouchManager();
@@ -85,8 +85,8 @@ export class LAppView {
     this._touchManager = null;
     this._deviceToScreen = null;
 
-    this._gear.release();
-    this._gear = null;
+    // this._gear.release();
+    // this._gear = null;
 
     this._back.release();
     this._back = null;
@@ -104,9 +104,9 @@ export class LAppView {
     if (this._back) {
       this._back.render(this._programId);
     }
-    if (this._gear) {
-      this._gear.render(this._programId);
-    }
+    // if (this._gear) {
+    //   this._gear.render(this._programId);
+    // }
 
     gl.flush();
 
@@ -152,20 +152,20 @@ export class LAppView {
 
     // 歯車画像初期化
     // 齿轮图像初始化
-    imageName = LAppDefine.GearImageName;
-    const initGearTexture = (textureInfo: TextureInfo): void => {
-      const x = width - textureInfo.width * 0.5;
-      const y = height - textureInfo.height * 0.5;
-      const fwidth = textureInfo.width;
-      const fheight = textureInfo.height;
-      this._gear = new LAppSprite(x, y, fwidth, fheight, textureInfo.id);
-    };
+    // imageName = LAppDefine.GearImageName;
+    // const initGearTexture = (textureInfo: TextureInfo): void => {
+    //   const x = width - textureInfo.width * 0.5;
+    //   const y = height - textureInfo.height * 0.5;
+    //   const fwidth = textureInfo.width;
+    //   const fheight = textureInfo.height;
+    //   this._gear = new LAppSprite(x, y, fwidth, fheight, textureInfo.id);
+    // };
 
-    textureManager.createTextureFromPngFile(
-      resourcesPath + imageName,
-      false,
-      initGearTexture
-    );
+    // textureManager.createTextureFromPngFile(
+    //   resourcesPath + imageName,
+    //   false,
+    //   initGearTexture
+    // );
 
     // シェーダーを作成
     if (this._programId == null) {
@@ -231,14 +231,14 @@ export class LAppView {
       live2DManager.onTap(x, y);
 
       // 歯車にタップしたか
-      if (
-        this._gear.isHit(
-          pointX * window.devicePixelRatio,
-          pointY * window.devicePixelRatio
-        )
-      ) {
-        live2DManager.nextScene();
-      }
+      // if (
+      //   this._gear.isHit(
+      //     pointX * window.devicePixelRatio,
+      //     pointY * window.devicePixelRatio
+      //   )
+      // ) {
+      //   live2DManager.nextScene();
+      // }
     }
   }
 
@@ -284,7 +284,7 @@ export class LAppView {
   _viewMatrix: CubismViewMatrix; // viewMatrix
   _programId: WebGLProgram; // シェーダID
   _back: LAppSprite; // 背景画像
-  _gear: LAppSprite; // ギア画像
+  // _gear: LAppSprite; // ギア画像
   _changeModel: boolean; // モデル切り替えフラグ
   _isClick: boolean; // クリック中
 }

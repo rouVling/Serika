@@ -8,6 +8,7 @@
 import { LAppDelegate } from './lappdelegate';
 import * as LAppDefine from './lappdefine';
 import { LAppGlManager } from './lappglmanager';
+import { LAppLive2DManager } from './lapplive2dmanager';
 
 /**
  * ブラウザロード後の処理
@@ -26,6 +27,26 @@ window.addEventListener(
     }
 
     LAppDelegate.getInstance().run();
+
+    // adding ignore mouse event listener
+    let parent = document.getElementById('live2d');
+    parent?.addEventListener("pointermove", (e) => {
+      // console.log("pointermove: ", e.x, e.y)
+      // console.log()
+      const model = LAppLive2DManager.getInstance().getModel(0);
+      const view = LAppDelegate.getInstance().getView();
+      const x = view?._deviceToScreen.transformX(e.x);
+      const y = view?._deviceToScreen.transformY(e.y);
+      // console.log(model?.anyhitTest(x, y))
+      window.api.setIgnoreMouseEvent(!model?.anyhitTest(x, y))
+      // const canvas = parent?.children[0] as HTMLCanvasElement;
+      // const ctx = canvas.getContext('webgl');
+      // let arr = new Uint8Array(4);
+      // ctx?.readPixels(e.x, e.y, 1, 1, ctx.ALPHA, ctx.UNSIGNED_BYTE, arr);
+      // console.log(arr)
+      // window.api.setIgnoreMouseEvent(alpha![3] === 0)
+
+    });
   },
   { passive: true }
 );
