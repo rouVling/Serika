@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react"
-import { BoolItem, TextFieldItem, TextItemPart } from "./components";
+import { BoolItem, TextFieldItem, TextItemPart, LongTextFieldItem } from "./components";
 import Store from 'electron-store'
 
 import KeyIcon from '@mui/icons-material/Key';
@@ -21,6 +21,7 @@ export default function App() {
   const [apikey, setApikey] = useState("")
   const [enableClickThrough, setEnableClickThrough] = useState(false)
   const [tokenSaveMode, setTokenSaveMode] = useState(true)
+  const [prompt, setPrompt] = useState("")
 
   const [tabNum, setTabNum] = useState(0)
   const [on, setOn] = useState(false)
@@ -40,6 +41,12 @@ export default function App() {
   useEffect(() => {
     window.api.getStore("enableClickThrough").then((value: boolean) => {
       setEnableClickThrough(value === undefined? false: value)
+    })
+  }, [])
+
+  useEffect(() => {
+    window.api.getStore("prompt").then((value: string) => {
+      setPrompt(value? value : "")
     })
   }, [])
 
@@ -75,6 +82,8 @@ export default function App() {
         {/* <TextFieldItem icon={<KeyIcon />} mainText="API Key" description="API Key 用于访问 GPT-SoVits 服务" type="input" callback={(val) => { }} content={apiKey} /> */}
 
         <TextFieldItem icon={<KeyIcon />} mainText="API Key" description="API Key 用于访问大语言模型" type="input" callback={(val) => { setApikey(val); window.api.setStore("apikey", val) }} content={apikey} />
+
+        <LongTextFieldItem icon={<KeyIcon />} mainText="prompt" description="prompt 用于指定人物形象性格" type="input" callback={(val) => { setPrompt(val); window.api.setStore("prompt", val) }} content={prompt} />
 
         {/* <div className="rightContainerItem">ok<br /> sometext</div> */}
       </div>

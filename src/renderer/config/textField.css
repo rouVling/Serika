@@ -31,3 +31,34 @@ input[type="text"]:focus-visible {
     background-color: var(--textfield-active-background-color);
 }
 
+textarea {
+  background-color: var(--textfield-background-color);
+  width: 100%;
+  /* max-width: 100%; */
+  /* min-width: 100%; */
+  height: 6em;
+  max-height: 10em;
+  margin-top: 10px;
+  margin-right: 10px;
+  margin-left: -20px;
+  color: white;
+  border: 1px solid #414141;
+  border-bottom: 1px solid white;
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+  font-size: 1rem;
+  resize: vertical;
+}
+
+textarea:hover {
+	background-color: var(--textfield-hover-background-color);
+}
+
+textarea:focus-visible {
+	outline: none;
+	border: 1px solid var(--textfield-active-background-color);
+	border-bottom: 1px solid var(--textfield-active-color);
+	background-color: var(--textfield-active-background-color);
+}
+
+/* width: "100%", height:"6em", marginTop: "10px", marginLeft:"-20px", marginRight:"-20px", borderTop: "solid 1px #414141", borderRight: "solid 1px #414141", borderLeft: "solid 1px #414141", textJustify: "initial" */

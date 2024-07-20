@@ -53,3 +53,10 @@ export function TextFieldItem(props: ConfigItemProps) {
     <input type="text" value={props.content} onChange={(e) => props.callback(e.target.value)} />
   </div>
 }
+
+export function LongTextFieldItem(props: ConfigItemProps) {
+  return <div className="rightContainerItem" style={{flexWrap: "wrap", height: "auto"}}>
+    <TextItemPart icon={props.icon} mainText={props.mainText} description={props.description} />
+    <textarea type="text" value={props.content} onChange={(e) => props.callback(e.target.value)} />
+  </div>
+}

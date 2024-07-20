@@ -36,6 +36,7 @@ export default function App(): JSX.Element {
 
   const [apikey, setApikey] = React.useState<string>("")
   const [tokenSaveMode, setTokenSaveMode] = React.useState<boolean>(true)
+  const [prompt, setPrompt] = React.useState<string>("")
 
   // IPC event listeners
 
@@ -67,12 +68,32 @@ export default function App(): JSX.Element {
     }
   }, [])
 
+  useEffect(() => {
+    window.api.onUpdatePrompt((value: string) => {
+      setPrompt(value)
+    })
+    return () => {
+      window.api.onUpdatePrompt(() => { })
+    }
+  }, [])
+
   // init store
   useEffect(() => {
     window.api.getStore("apikey").then((value: string) => {
       setApikey(value ? value : "")
     })
   }, [])
+  useEffect(() => {
+    window.api.getStore("tokenSaveMode").then((value: boolean) => {
+      setTokenSaveMode(value === undefined ? true : value)
+    })
+  }, [])
+  useEffect(() => {
+    window.api.getStore("prompt").then((value: string) => {
+      setPrompt(value ? value : "")
+    })
+  }, [])
+
 
 
   useEffect(() => {
@@ -158,7 +179,8 @@ export default function App(): JSX.Element {
         (img === "") ? [...messages, { content: input, role: "user" }] : [...messages, { content: input, role: "user", img: img }],
         apikey,
         // "你是一个桌面萌宠内置的AI，你需要给用户陪伴与亲密。在用户与你对话的时候，请使用尽可能简短的回答进行对话。请不要在回答中出现英文。如果需要使用，请使用其他表达方式替代，请不要使用 markdown 标记",
-        undefined,
+        prompt,
+        // undefined,
         tokenSaveMode
       ).then((response) => {
 

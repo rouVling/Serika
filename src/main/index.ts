@@ -78,6 +78,9 @@ function createWindow(): void {
       case "tokenSaveMode":
         mainWindow.webContents.send('update-tokenSaveMode', value)
         break
+      case "prompt":
+        mainWindow.webContents.send('update-prompt', value)
+        break
     }
   })
 
