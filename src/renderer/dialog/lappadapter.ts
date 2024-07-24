@@ -41,6 +41,10 @@ export class LAppAdapter {
     return groups;
   }
 
+  public getMotionCount(group: string): number {
+    return this.getModel()?._modelSetting.getMotionCount(group) ?? 0;
+  }
+
   public startMotion(
     group: string,
     no: number,
@@ -48,6 +52,20 @@ export class LAppAdapter {
     onFinishedMotionHandler?: FinishedMotionCallback
   ): CubismMotionQueueEntryHandle {
     return this.getModel()?.startMotion(group, no, priority, onFinishedMotionHandler) ?? InvalidMotionQueueEntryHandleValue;
+  }
+
+  /* expression */
+
+  public getExpressionCount(): number {
+    return this.getModel()?._expressions.getSize() ?? 0;
+  }
+
+  public getExpressionName(index: number): string {
+    return this.getModel()?._expressions._keyValues[index].first;
+  }
+
+  public setExpression(name: string): void {
+    this.getModel()?.setExpression(name);
   }
 
   public nextScene(): void {
