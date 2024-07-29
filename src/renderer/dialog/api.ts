@@ -59,7 +59,29 @@ export function getVoiceLocal(inputText: string): Promise<string> {
   })
 }
 
-export function getResponseGPT(msgs: DialogMessage[], api_key: string, prompt?: string): Promise<string> {
+export function getVoiceOTTO(inputText: string): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const xhttp = new XMLHttpRequest()
+    xhttp.open("POST", "http://api.otto.nandgate.top/make", false)
+    xhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded")
+    xhttp.onreadystatechange = function () {
+      if (JSON.parse(xhttp.responseText).code == 400) {
+        reject("error in generating voice")
+      } else {
+        resolve("http://api.otto.nandgate.top/get/" + JSON.parse(xhttp.responseText).id + ".wav")
+      }
+    }
+    xhttp.onerror = function () {
+      reject("error")
+    }
+    xhttp.send("text=" + inputText + "&inYsddMode=true&norm=true&reverse=false&speedMult=1&pitchMult=1")
+  })
+}
+
+export function getResponseGPT(msgs: DialogMessage[], api_key: string, prompt?: string, saveTokenMode: boolean = true): Promise<string> {
+
+  const contents = prompt ? [{ content: prompt, role: "user" }, ...msgs] : msgs
+
   return new Promise((resolve, reject) => {
     fetch("https://api.openai-sb.com/v1/chat/completions", {
       method: "POST",
@@ -68,12 +90,19 @@ export function getResponseGPT(msgs: DialogMessage[], api_key: string, prompt?: 
         "Authorization": "Bearer " + api_key
       },
       body: JSON.stringify({
-        "model": "gpt-3.5-turbo",
-        "messages": [{
-          "role": "user",
-          "content": "你是一个桌面萌宠内置的AI, 你需要给用户陪伴与亲密。在用户与你对话的时候，请使用尽可能简短的回答进行对话。由于用户端文字转语音限制，请不要在回答中出现英文单词。如果需要使用，请使用其他表达方式替代"
-        }, ...msgs.map((message) => { return { role: message.role, content: message.content } })],
-        "temperature": 0.7,
+        // "model": "gpt-3.5-turbo",
+        "model": "gpt-4o-mini",
+        "messages": contents.map((message) => {
+          return {
+            role: message.role,
+            content: (message as DialogMessage).img ? (
+              ((saveTokenMode && message === contents[contents.length - 1]) || !saveTokenMode) ?
+                [{ type: "text", text: message.content }, { type: "image_url", image_url: { url: "data:image/jpeg;base64," + (message as DialogMessage).img } }] :
+                [{ type: "text", text: message.content }]
+            ) : [{ type: "text", text: message.content }]
+          }
+        }),
+        "temperature": 0.5,
       })
     }).then((res) => {
       res.json().then((data) => {
