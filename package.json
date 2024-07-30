@@ -1,10 +1,10 @@
 {
-  "name": "elevite",
+  "name": "serika",
   "version": "1.0.0",
-  "description": "An Electron application with React and TypeScript",
+  "description": "A desktop AI assistant",
   "main": "./out/main/index.js",
   "author": "example.com",
-  "homepage": "https://electron-vite.org",
+  "homepage": "https://github.com/rouVling/Serika.git",
   "type": "module",
   "scripts": {
     "format": "prettier --write .",
@@ -32,18 +32,21 @@
     "dotenv": "^16.4.5",
     "electron-screenshots": "^0.5.26",
     "electron-store": "^10.0.0",
-    "electron-updater": "^6.1.7"
+    "electron-updater": "^6.1.7",
+    "mui-markdown": "^1.1.14"
   },
   "devDependencies": {
     "@electron-toolkit/eslint-config-prettier": "^2.0.0",
     "@electron-toolkit/eslint-config-ts": "^1.0.1",
     "@electron-toolkit/tsconfig": "^1.0.1",
+    "@electron/packager": "^18.3.3",
     "@types/node": "^18.19.9",
     "@types/react": "^18.2.48",
     "@types/react-dom": "^18.2.18",
     "@vitejs/plugin-react": "^4.2.1",
     "electron": "^28.2.0",
     "electron-builder": "^24.13.3",
+    "electron-packager": "^17.1.2",
     "electron-vite": "^2.0.0",
     "eslint": "^8.56.0",
     "eslint-plugin-react": "^7.33.2",

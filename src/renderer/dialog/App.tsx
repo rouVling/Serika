@@ -14,14 +14,14 @@ import ScreenshotMonitorIcon from '@mui/icons-material/ScreenshotMonitor';
 import ContentCutIcon from '@mui/icons-material/ContentCut';
 import QuestionMarkIcon from '@mui/icons-material/QuestionMark';
 
-import { getVoiceLocal, getResponseGPT, getResponseGemini } from "./api"
+import { getVoiceLocal, getVoiceOTTO, getResponseGPT, getResponseGemini } from "./api"
 import { ExponentialTimer } from "./utils"
 import { dialog } from "electron"
 import { LAppAdapter } from "./lappadapter"
 import { windowsStore } from "process"
 
 
-const lappmanager = LAppAdapter.getInstance()
+const lappAdapter = LAppAdapter.getInstance()
 
 export default function App(): JSX.Element {
 
@@ -43,7 +43,7 @@ export default function App(): JSX.Element {
   useEffect(() => {
     window.api.onUpdateScreenShotResult((value: string) => {
       setImg(value)
-      // console.log(value)
+      console.log(value)
     })
     return () => {
       window.api.onUpdateScreenShotResult(() => { })
@@ -77,6 +77,15 @@ export default function App(): JSX.Element {
     }
   }, [])
 
+  useEffect(() => {
+    window.api.onUpdateChara((folder: string, chara: string) => {
+      lappAdapter.setChara(folder, chara)
+    })
+    return () => {
+      window.api.onUpdateChara(() => { })
+    }
+  }, [])
+
   // init store
   useEffect(() => {
     window.api.getStore("apikey").then((value: string) => {
@@ -93,8 +102,13 @@ export default function App(): JSX.Element {
       setPrompt(value ? value : "")
     })
   }, [])
-
-
+  useEffect(() => {
+    window.api.getStore("modelPath").then((value: string) => {
+      window.api.getStore("modelName").then((value2: string) => {
+        lappAdapter.setChara(value, value2)
+      })
+    })
+  }, [])
 
   useEffect(() => {
     const audio = new Audio(voiceUrl)
@@ -116,12 +130,12 @@ export default function App(): JSX.Element {
 
   useEffect(() => {
     const dragBar = document.getElementById("dragBar")
-    dragBar?.addEventListener("pointerover" , () => {
-    // console.log("enable touching")
+    dragBar?.addEventListener("pointerover", () => {
+      // console.log("enable touching")
       setIgnoreMouseEvent(false)
     })
     dragBar?.addEventListener("pointerout", () => {
-    // console.log("disable touching")
+      // console.log("disable touching")
       setIgnoreMouseEvent(true)
     })
     return () => {
@@ -143,7 +157,8 @@ export default function App(): JSX.Element {
       ).then((response) => {
         console.log("interval response: ", response)
 
-        getVoiceLocal(response).then((url) => {
+        // getVoiceLocal(response).then((url) => {
+        getVoiceOTTO(response).then((url) => {
           setVoiceUrl(url)
           setMessages((prev) => [...prev, { content: response, role: "assistant", voiceUrl: new Audio(url), voiceType: "element" }])
         })
@@ -174,17 +189,17 @@ export default function App(): JSX.Element {
       // console.log(img)
       // console.log(messages)  // not updated yet
 
-      // getResponseGPT([...messages, { content: input, role: "user" }], apikey).then((response) => {
+      // getResponseGPT(
       getResponseGemini(
         (img === "") ? [...messages, { content: input, role: "user" }] : [...messages, { content: input, role: "user", img: img }],
         apikey,
-        // "你是一个桌面萌宠内置的AI，你需要给用户陪伴与亲密。在用户与你对话的时候，请使用尽可能简短的回答进行对话。请不要在回答中出现英文。如果需要使用，请使用其他表达方式替代，请不要使用 markdown 标记",
         prompt,
         // undefined,
         tokenSaveMode
       ).then((response) => {
 
-        getVoiceLocal(response).then((url) => {
+        // getVoiceLocal(response).then((url) => {
+        getVoiceOTTO(response).then((url) => {
           setVoiceUrl(url)
           setMessages((prev) => [...prev, { content: response, role: "assistant", voiceUrl: new Audio(url), voiceType: "element" }])
         }).catch((err) => {
@@ -223,18 +238,6 @@ export default function App(): JSX.Element {
         }
       </div>
     </center>
-    {/* <center>
-      <div
-        id="hideChatButton"
-        onClick={() => { setHideChat(!hideChat) }}
-        style={{
-          // borderBottom: "5px solid rgba(195, 201, 255, 0.671)",
-          borderLeft: "80px solid transparent",
-          borderRight: "80px solid transparent",
-          transform: "rotateX(" + (hideChat ? "0deg" : "180deg"),
-        }}
-      ></div>
-    </center> */}
     <div id="inputContainer">
       <center>
         <div id="buttonGroup">
@@ -280,12 +283,30 @@ export default function App(): JSX.Element {
             onPointerOut={() => { setIgnoreMouseEvent(true) }}
             onClick={
               () => {
-                console.log(lappmanager.getMotionGroups())
-                console.log(lappmanager.getMotionGroups())
-                lappmanager.nextScene()
+                // console.log(lappAdapter.getMotionGroups())
+                // lappAdapter.nextScene()
                 // lappmanager.startMotion(lappmanager.getMotionGroups()[0], 0, 1)
                 // () => lappmanager.startMotion("Idle", 3, 1)
-              }}><QuestionMarkIcon /></button>
+                // for(let i = 0; i < lappAdapter.getExpressionCount(); i++) {
+                  // console.log(lappAdapter.getExpressionName(i))
+                // }
+
+                if (lappAdapter.getExpressionCount() > 0) {
+                  lappAdapter.setExpression(lappAdapter.getExpressionName(Math.floor(Math.random() * lappAdapter.getExpressionCount())))
+                }
+              }} ><QuestionMarkIcon /></button>
+
+          {/* <button className="miniButton"
+            onPointerOver={() => { setIgnoreMouseEvent(false) }}
+            onPointerOut={() => { setIgnoreMouseEvent(true) }}
+            onClick={
+              () => {
+                // console.log(lappAdapter.getMotionGroups())
+                // lappAdapter.nextChara()
+                lappAdapter.setChara("D:\\000\\personal\\serika\\src\\renderer\\Resources", "一坨")
+                // lappmanager.startMotion(lappmanager.getMotionGroups()[0], 0, 1)
+                // () => lappmanager.startMotion("Idle", 3, 1)
+              }} ><QuestionMarkIcon /></button> */}
         </div>
         {/* <Paper> */}
         <input
@@ -297,6 +318,16 @@ export default function App(): JSX.Element {
           disabled={disableInput}
           onPointerOver={() => { setIgnoreMouseEvent(false) }}
           onPointerOut={() => { setIgnoreMouseEvent(true) }}
+          onPaste={(e) => {
+            if (e.clipboardData.files[0].type === "image/png") {
+              e.clipboardData.files[0].arrayBuffer().then((buffer) => {
+                setImg(getBase64(new Uint8Array(buffer)))
+              })
+            }
+            else {
+              e.preventDefault()
+            }
+          }}
         ></input>
         {/* </Paper> */}
       </center>
@@ -305,3 +336,27 @@ export default function App(): JSX.Element {
   )
 }
 
+function getBase64(unit8Array) {
+  let keyStr = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
+  var output = "";
+  var chr1, chr2, chr3, enc1, enc2, enc3, enc4;
+  var i = 0;
+  while (i < unit8Array.length) {
+    chr1 = unit8Array[i++];
+    chr2 = unit8Array[i++];
+    chr3 = unit8Array[i++];
+
+    enc1 = chr1 >> 2;
+    enc2 = (chr1 & 3) << 4 | chr2 >> 4;
+    enc3 = (chr2 & 15) << 2 | chr3 >> 6;
+    enc4 = chr3 & 63;
+
+    if (isNaN(chr2)) {
+      enc3 = enc4 = 64;
+    } else if (isNaN(chr3)) {
+      enc4 = 64;
+    }
+    output = output + keyStr.charAt(enc1) + keyStr.charAt(enc2) + keyStr.charAt(enc3) + keyStr.charAt(enc4);
+  }
+  return output;
+}

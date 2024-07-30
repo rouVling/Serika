@@ -1,13 +1,16 @@
-import { app, shell, BrowserWindow, ipcMain, screen, session } from 'electron'
+import { app, shell, BrowserWindow, ipcMain, screen, session, dialog } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
+// import Screenshots from 'electron-screenshots'
 import Screenshots from 'electron-screenshots'
-import { createConfigWindow } from './config'
+import { createConfigWindow } from './config.js'
 import { Provider } from 'electron-updater'
 import Store from 'electron-store'
 
 const store = new Store()
+
+//@ts-ignore
 let enableClickThrough = store.get("enableClickThrough") ?? false
 
 function createWindow(): void {
@@ -70,6 +73,7 @@ function createWindow(): void {
 
 
   ipcMain.on("setStore", (event, key, value) => {
+    //@ts-ignore
     store.set(key, value)
     switch (key) {
       case "apikey":
@@ -86,7 +90,7 @@ function createWindow(): void {
 
   ipcMain.on("setEnableClickThrough", (event, enable: boolean) => {
     enableClickThrough = enable
-    if(enable == false) {
+    if (enable == false) {
       mainWindow.setIgnoreMouseEvents(false, { forward: true })
     }
   })
@@ -95,6 +99,10 @@ function createWindow(): void {
     if (enableClickThrough) {
       mainWindow.setIgnoreMouseEvents(ignore, { forward: true })
     }
+  })
+
+  ipcMain.on("setChara", (event, folder: string, chara: string) => {
+    mainWindow.webContents.send('update-chara', folder, chara)
   })
 }
 
@@ -149,7 +157,32 @@ app.on('window-all-closed', () => {
 
 
 ipcMain.handle("getStore", (event, key) => {
+  //@ts-ignore
   return store.get(key)
+})
+
+ipcMain.handle("open-file", async () => {
+  const { canceled, filePaths } = await dialog.showOpenDialog({
+    properties: ['openFile', 'multiSelections']
+  })
+  if (!canceled) {
+    return filePaths[0]
+  }
+  else {
+    return ""
+  }
+})
+
+ipcMain.handle("open-folder", async () => {
+  const { canceled, filePaths } = await dialog.showOpenDialog({
+    properties: ['openDirectory']
+  })
+  if (!canceled) {
+    return filePaths[0]
+  }
+  else {
+    return ""
+  }
 })
 
 function getBase64(unit8Array) {

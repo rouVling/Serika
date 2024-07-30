@@ -1,0 +1,37 @@
+:root {
+    --background-color: #202020;
+    --highlight-color: #2d2d2d;
+    --theme-color: #76b9ed;
+}
+
+select {
+    margin-right: 20px;
+    background-size: 1.5em;
+    padding-right: 2em;
+    border: 1px solid #414141;
+    border-radius: 5px;
+    font-size: 1rem;
+    padding: .5rem 1rem;
+    cursor: pointer;
+    width: 30%;
+    background: #3e3e3f;
+    color: white;
+    transition: 200ms ease-out;
+}
+
+select:hover {
+    background-color: var(--highlight-color);
+}
+
+select:focus-visible {
+    outline: none;
+    border: 1px solid var(--theme-color);
+    background-color: var(--highlight-color);
+}
+
+select option {
+    border-radius: 5px;
+    margin: 5px;
+    background: #202020;
+    color: white;
+}

@@ -1,5 +1,7 @@
 import { LAppLive2DManager } from "../live2d/lapplive2dmanager";
 import { LAppModel } from "../live2d/lappmodel";
+import * as LAppDefine from '../live2d/lappdefine';
+import { LAppPal } from "../live2d/lapppal";
 
 import {
   ACubismMotion,
@@ -68,8 +70,21 @@ export class LAppAdapter {
     this.getModel()?.setExpression(name);
   }
 
-  public nextScene(): void {
+  public nextChara(): void {
     this.getMgr().nextScene();
+  }
+
+  public setChara(ModelDir: string, ModelName: string): void {
+    const modelPath = (ModelDir.endsWith('/') ? ModelDir : ModelDir + '/') + ModelName + '/';
+    const modelJsonName = ModelName + '.model3.json';
+
+    if (LAppDefine.DebugLogEnable) {
+      LAppPal.printMessage(`[APP]model Dir: ${modelPath}`);
+    }
+
+    this.getMgr().releaseAllModel();
+    this.getMgr()._models.pushBack(new LAppModel());
+    this.getMgr()._models.at(0)?.loadAssets(modelPath, modelJsonName);
   }
 
   // private _live2DMgr: LAppLive2DManager;
