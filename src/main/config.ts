@@ -5,7 +5,14 @@ import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import { config } from 'dotenv'
 
+let cfgWindow: BrowserWindow | null = null
+
 export function createConfigWindow(): void {
+
+  if (cfgWindow) {
+    cfgWindow.show()
+    return
+  }
 
   const configWindow = new BrowserWindow({
     width: 905,
@@ -20,6 +27,12 @@ export function createConfigWindow(): void {
       sandbox: false
     }
   })
+
+  configWindow.on('closed', () => {
+    cfgWindow = null
+  })
+
+  cfgWindow = configWindow
 
   configWindow.on('ready-to-show', () => {
     configWindow.show()
