@@ -1,12 +1,51 @@
 # Serika
 
-An Electron application with TypeScript
+使用 Electron + React 构建的桌面 AI 助手，使用 live2d 作为人物模型，支持 GPT, Gemini 作为聊天引擎
 
-<!-- and react... perhaps -->
+![alt text](./readme-src/appearance.png)
 
-## Recommended IDE Setup
+目前支持的特性：
 
-- [VSCode](https://code.visualstudio.com/) + [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) + [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)
+- 点击穿透
+- 截图，图像粘贴发送
+- 语音合成 （需要启动 GPT-SoVits，运行 api.py）
+- 彩蛋
+  - 电棍语音合成 + 说的道理 live2d （使用模型 "一坨"） [模型作者链接](https://www.bilibili.com/video/BV1F94y1X7x6/)
+
+## TODOs
+
+- 用户体验
+  - 语言模型切换，镜像链接设置
+  - 接口错误处理
+  - [x] 禁止多个设置窗口
+  - 对话记录删除
+  - ~~对话记录编辑~~
+  - 语音重播功能修复
+  - 窗口拖动功能修复
+  - 窗口等比例缩放
+  - 错误提示框
+  - 任务栏 icon 
+  - style 设置
+- 功能
+  - kimi api 支持
+  - 代码执行功能
+  - JSON格式回复
+  - 人物动作表情对接
+  - 程序自主截图功能
+  - 代码结构优化
+  - 大窗口长对话
+  - [x] 设置页面
+  - [x] 截图功能
+  - [x] 图像功能
+  - [x] 储存设置
+  - [x] 主窗口 UI 优化
+- 实验与探索
+  - 聊天记录保存
+  - MMD 模型支持
+  - [x] l2d 模型路径设置
+  - python 后端功能扩展
+
+
 
 ## Run the project
 
