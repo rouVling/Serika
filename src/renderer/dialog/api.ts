@@ -1,6 +1,5 @@
-import { Google } from "@mui/icons-material"
 import { DialogMessage, GeminiResponse } from "./types"
-// import { GoogleGenerativeAI } from "@google/generative-ai"
+import { FunctionDeclarationSchemaType, GoogleGenerativeAI, HarmBlockThreshold, HarmCategory } from "@google/generative-ai"
 
 export function getVoiceUsingModelscope(inputText): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -65,6 +64,12 @@ export function getVoiceOTTO(inputText: string): Promise<string> {
     xhttp.open("POST", "http://api.otto.nandgate.top/make", false)
     xhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded")
     xhttp.onreadystatechange = function () {
+      if (xhttp.readyState != 4) {
+        return;
+      }
+      if (xhttp.status != 200) {
+        reject("error")
+      }
       if (JSON.parse(xhttp.responseText).code == 400) {
         reject("error in generating voice")
       } else {
@@ -74,7 +79,14 @@ export function getVoiceOTTO(inputText: string): Promise<string> {
     xhttp.onerror = function () {
       reject("error")
     }
-    xhttp.send("text=" + inputText + "&inYsddMode=true&norm=true&reverse=false&speedMult=1&pitchMult=1")
+    xhttp.onabort = function () {
+      reject("aborted")
+    }
+    try {
+      xhttp.send("text=" + inputText + "&inYsddMode=true&norm=true&reverse=false&speedMult=1&pitchMult=1")
+    } catch (e) {
+      reject(e)
+    }
   })
 }
 
@@ -148,6 +160,68 @@ export function getResponseGemini(msgs: DialogMessage[], api_key: string, prompt
       res.json().then((data: GeminiResponse) => {
         resolve(data.candidates[0].content.parts[0].text)
       })
+    }).catch((err) => {
+      reject(err)
+    })
+  })
+}
+
+export function getJsonResponseGemini(msgs: DialogMessage[], api_key: string, prompt?: string, saveTokenMode: boolean = true): Promise<string | undefined> {
+  const genAI = new GoogleGenerativeAI(api_key)
+  const model = genAI.getGenerativeModel({
+    model: "gemini-1.5-pro",
+    safetySettings: [
+      { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_NONE },
+      { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_NONE },
+      { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_NONE },
+    ],
+    generationConfig: {
+      responseMimeType: "application/json",
+      candidateCount: 1,
+      responseSchema: {
+        type: FunctionDeclarationSchemaType.OBJECT,
+        properties: {
+          //@ts-ignore
+          responseText: {
+            type: FunctionDeclarationSchemaType.STRING
+          },
+          expression: {
+            type: FunctionDeclarationSchemaType.STRING,
+            // required: false
+            //@ts-ignore
+            nullable: true
+          },
+          motion: {
+            type: FunctionDeclarationSchemaType.STRING,
+            //@ts-ignore
+            nullable: true
+          },
+          delayTime: {
+            type: FunctionDeclarationSchemaType.NUMBER,
+            //@ts-ignore
+            nullable: true
+          },
+        }
+      }
+    }
+  });
+  // const contents = prompt ? [{ content: prompt, role: "user" }, ...msgs] : msgs
+
+  return new Promise((resolve, reject) => {
+    model.generateContent({
+      contents: (msgs.map((message, index) => {
+        return {
+          role: (message.role === "user") ? "user" : "model",
+          parts: (message.img) ?
+            (
+              ((saveTokenMode && index === msgs.length - 1) || !saveTokenMode) ?
+                [{ text: message.content }, { inlineData: { mimeType: "image/png", data: message.img } }]
+                : ([{ text: message.content }])
+            ) : ([{ text: message.content }])
+        }
+      }))
+    }).then((data) => {
+      resolve(data.response.candidates?.[0]?.content.parts[0].text)
     }).catch((err) => {
       reject(err)
     })
