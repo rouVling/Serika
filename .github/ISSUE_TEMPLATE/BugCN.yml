@@ -1,0 +1,39 @@
+name: 软件 Bug 反馈
+description: 请填写一下有关 Bug 反馈的表格
+title: '[Bug]: '
+labels:
+  - Bug
+body:
+  - type: checkboxes
+    id: stable_reproduction
+    attributes:
+      label: 复现稳定性
+      description: 该问题是否可以被稳定复现？
+      options:
+        - label: '是，我已经找到了一个可以稳定复现该 Bug 的方法'
+          required: true
+        - label: '否，我没只是偶然触发了一次，并没有找到稳定复现方法'
+          required: true
+  - type: input
+    id: bug_description
+    attributes:
+      label: 请描述你遇到的 Bug
+      description: >-
+        请具体描述该 Bug 是如何影响正常使用的
+      placeholder: The description
+    validations:
+      required: true
+  - type: dropdown
+    id: bug_type
+    attributes:
+      label: Bug 类型
+      description: 选择一个 Bug 类型
+      options:
+        - 界面
+        - 功能
+    validations:
+      required: true
+  - type: input
+    id: reproduction_way
+    attributes:
+      label: 如何复现该 Bug
