@@ -2,7 +2,7 @@ name: 软件 Bug 反馈
 description: 请填写一下有关 Bug 反馈的表格
 title: '[Bug]: '
 labels:
-  - Bug
+  - bug
 body:
   - type: checkboxes
     id: stable_reproduction

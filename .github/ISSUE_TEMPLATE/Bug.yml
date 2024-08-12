@@ -2,7 +2,7 @@ name: Bug report
 description: Template for bug reports
 title: '[Bug]: '
 labels:
-  - Bug
+  - bug
 body:
   - type: checkboxes
     id: stable_reproduction
