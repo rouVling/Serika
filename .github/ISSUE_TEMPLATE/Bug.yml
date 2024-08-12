@@ -1,0 +1,40 @@
+name: Bug report
+description: Template for bug reports
+title: '[Bug]: '
+labels:
+  - Bug
+body:
+  - type: checkboxes
+    id: stable_reproduction
+    attributes:
+      label: Stable Reproducibility
+      description: Whether the bug can be reproduction stably?
+      options:
+        - label: Yes, I've found a way to reproduce stably
+          required: true
+        - label: 'No, this bug is hard to be reproduce '
+          required: true
+  - type: input
+    id: bug_description
+    attributes:
+      label: Please Describe the Bug You Found
+      description: >-
+        How the bug effects the normal using, and how glitch the software will
+        be after emitted the bug.
+      placeholder: The description
+    validations:
+      required: true
+  - type: dropdown
+    id: bug_type
+    attributes:
+      label: Bug Type
+      description: Choose the Type of the Bug You Found
+      options:
+        - UI
+        - Function
+    validations:
+      required: true
+  - type: input
+    id: reproduction_way
+    attributes:
+      label: How to Reproduce this Bug
