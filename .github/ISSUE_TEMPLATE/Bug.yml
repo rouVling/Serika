@@ -11,9 +11,11 @@ body:
       description: Whether the bug can be reproduction stably?
       options:
         - label: Yes, I've found a way to reproduce stably
-          required: true
+          required: false
         - label: 'No, this bug is hard to be reproduce '
-          required: true
+          required: false
+    validations:
+      required: true
   - type: input
     id: bug_description
     attributes:

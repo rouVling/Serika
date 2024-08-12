@@ -11,9 +11,11 @@ body:
       description: 该问题是否可以被稳定复现？
       options:
         - label: '是，我已经找到了一个可以稳定复现该 Bug 的方法'
-          required: true
+          required: false
         - label: '否，我没只是偶然触发了一次，并没有找到稳定复现方法'
-          required: true
+          required: false
+    validations:
+      required: true
   - type: input
     id: bug_description
     attributes:
