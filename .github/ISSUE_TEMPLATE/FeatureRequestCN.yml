@@ -1,0 +1,23 @@
+name: 功能建议
+description: 请求更多功能 Serika
+title: '[Feature Request]: '
+body:
+  - type: textarea
+    attributes:
+      label: 您期望的功能的描述
+      description: 对问题或缺失功能的清晰简洁的描述。
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: 您想要的解决方案
+      description: 如果您有解决方案，请描述给我们。
+  - type: textarea
+    attributes:
+      label: 您考虑过的替代方案
+      description: 您是否考虑过任何替代解决方案或解决方法？
+  - type: markdown
+    attributes:
+      value: >-
+        This template was generated with [Issue Forms
+        Creator](https://issue-forms-creator.netlify.app)

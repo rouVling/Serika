@@ -4,16 +4,14 @@ title: '[Bug]: '
 labels:
   - bug
 body:
-  - type: checkboxes
+  - type: dropdown
     id: stable_reproduction
     attributes:
       label: 复现稳定性
       description: 该问题是否可以被稳定复现？
       options:
-        - label: '是，我已经找到了一个可以稳定复现该 Bug 的方法'
-          required: false
-        - label: '否，我没只是偶然触发了一次，并没有找到稳定复现方法'
-          required: false
+        - '是，我已经找到了一个可以稳定复现该 Bug 的方法'
+        - '否，我没只是偶然触发了一次，并没有找到稳定复现方法'
     validations:
       required: true
   - type: input

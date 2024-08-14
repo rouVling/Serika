@@ -1,19 +1,17 @@
 name: Bug report
-description: Template for bug reports
+description: Reporting Bug in Serika
 title: '[Bug]: '
 labels:
   - bug
 body:
-  - type: checkboxes
+  - type: dropdown
     id: stable_reproduction
     attributes:
       label: Stable Reproducibility
       description: Whether the bug can be reproduction stably?
       options:
-        - label: Yes, I've found a way to reproduce stably
-          required: false
-        - label: 'No, this bug is hard to be reproduce '
-          required: false
+        - 'Yes, I've found a way to reproduce stably'
+        - 'No, this bug is hard to be reproduce'
     validations:
       required: true
   - type: input
