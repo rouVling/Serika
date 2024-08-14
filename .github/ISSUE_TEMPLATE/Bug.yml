@@ -10,7 +10,7 @@ body:
       label: Stable Reproducibility
       description: Whether the bug can be reproduction stably?
       options:
-        - 'Yes, I've found a way to reproduce stably'
+        - "Yes, I've found a way to reproduce stably"
         - 'No, this bug is hard to be reproduce'
     validations:
       required: true
