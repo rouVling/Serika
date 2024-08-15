@@ -13,13 +13,18 @@ import ScreenshotIcon from '@mui/icons-material/Screenshot';
 import ScreenshotMonitorIcon from '@mui/icons-material/ScreenshotMonitor';
 import ContentCutIcon from '@mui/icons-material/ContentCut';
 import QuestionMarkIcon from '@mui/icons-material/QuestionMark';
+import PsychologyAltIcon from '@mui/icons-material/PsychologyAlt';
+import SaveIcon from '@mui/icons-material/Save';
 
-import { getVoiceLocal, getVoiceOTTO, getResponseGPT, getResponseGemini } from "./api"
+import { getVoiceLocal, getVoiceOTTO, getResponseGPT, getResponseGemini, getJsonResponseGemini } from "./api"
 import { ExponentialTimer } from "./utils"
 import { dialog } from "electron"
-import { LAppAdapter } from "./lappadapter"
+import { LAppAdapter } from "../live2d/lappadapter"
+import * as LappDefine from "../live2d/lappdefine"
 import { windowsStore } from "process"
 
+import { Slider } from "@mui/material"
+import { ContactlessOutlined } from "@mui/icons-material"
 
 const lappAdapter = LAppAdapter.getInstance()
 
@@ -37,6 +42,18 @@ export default function App(): JSX.Element {
   const [apikey, setApikey] = React.useState<string>("")
   const [tokenSaveMode, setTokenSaveMode] = React.useState<boolean>(true)
   const [prompt, setPrompt] = React.useState<string>("")
+  const [hiddenPrompt, setHiddenPrompt] = React.useState<string>("")
+
+  const [saveOnDelete, setSaveOnDelete] = React.useState<boolean>(false)
+
+  const [slideValue, setSlideValue] = React.useState<number>(1)
+
+  const [model, setModel] = React.useState<string>("")
+  const [getResponse, setGetResponse] = React.useState<Function>(() => { })
+  const [modelExpressionDesc, setModelExpressionDesc] = React.useState<string>("")
+  const [modelMotionDesc, setModelMotionDesc] = React.useState<string>("")
+  const [modelDesc, setModelDesc] = React.useState<string>("")
+
 
   // IPC event listeners
 
@@ -86,6 +103,54 @@ export default function App(): JSX.Element {
     }
   }, [])
 
+  useEffect(() => {
+    window.api.onModelValueRequested((value) => {
+
+      if (value.method === "get") {
+        switch (value.body.name) {
+          case "exps":
+            let exps = []
+            for (let i = 0; i < lappAdapter.getExpressionCount(); i++) {
+              exps.push(lappAdapter.getExpressionName(i))
+            }
+            window.api.sendModelValue({ name: value, value: exps })
+            break
+          case "motions":
+            const retval = { name: value, value: lappAdapter.getMotionGroups().map((name) => {
+              return { group: name, num: lappAdapter.getMotionCount(name) }
+            }) }
+            console.log("dialog/App.tsx: get motions")
+            window.api.sendModelValue(retval)
+            break
+          default:
+            break
+        }
+      } else if (value.method === "post") {
+        switch (value.body.command) {
+          case "setExpression":
+            lappAdapter.setExpression(value.body.value)
+            break
+          case "setExpressionDesc":
+            setModelExpressionDesc(JSON.stringify(value.body.value))
+            break
+          case "setMotion":
+            lappAdapter.startMotion(value.body.value.group, value.body.value.num, LappDefine.PriorityForce)
+            break
+          case "setMotionDesc":
+            setModelMotionDesc(value.body.value)
+            break
+          default:
+            break
+        }
+      } else {
+        console.log("dialog/App.tsx: model value requested: ", value)
+      }
+      return () => {
+        window.api.onModelValueRequested(() => { })
+      }
+    })
+  }, [])
+
   // init store
   useEffect(() => {
     window.api.getStore("apikey").then((value: string) => {
@@ -103,9 +168,29 @@ export default function App(): JSX.Element {
     })
   }, [])
   useEffect(() => {
+    window.api.getStore("hiddenPrompt").then((value: string) => {
+      setHiddenPrompt(value ? value : "")
+    })
+  }, [])
+  useEffect(() => {
+    window.api.getStore("saveOnDelete").then((value: boolean) => {
+      setSaveOnDelete(value === undefined ? false : value)
+    })
+  }, [])
+  useEffect(() => {
     window.api.getStore("modelPath").then((value: string) => {
       window.api.getStore("modelName").then((value2: string) => {
         lappAdapter.setChara(value, value2)
+        window.api.getStore(value2 + ".exps").then((value3) => {
+          if (value3) {
+            setModelExpressionDesc(JSON.stringify(value3))
+          }
+        })
+        window.api.getStore(value2 + ".motions").then((value3) => {
+          if (value3) {
+            // TODO
+          }
+        })
       })
     })
   }, [])
@@ -116,6 +201,11 @@ export default function App(): JSX.Element {
       audio.play()
     }
   }, [voiceUrl, replayVoice])
+
+  useEffect(() => {
+    // TODO: change the model
+    setGetResponse(getJsonResponseGemini)
+  }, [model])
 
   // JavaScript event listeners
 
@@ -190,13 +280,20 @@ export default function App(): JSX.Element {
       // console.log(messages)  // not updated yet
 
       // getResponseGPT(
-      getResponseGemini(
+      // getResponseGemini(
+      getJsonResponseGemini(
         (img === "") ? [...messages, { content: input, role: "user" }] : [...messages, { content: input, role: "user", img: img }],
         apikey,
-        prompt,
+        prompt + hiddenPrompt,
         // undefined,
+        "请在 responseText 中回复用户的对话，请注意 prompt。请在 expression 中选择合适的表情（可为空）。表情选项及描述如下：" + modelExpressionDesc,
         tokenSaveMode
       ).then((response) => {
+
+        const jsonResponse = JSON.parse(response)
+        if (jsonResponse.expression !== null) { lappAdapter.setExpression(jsonResponse.expression) }
+        // if (jsonResponse.motion !== null) { lappAdapter.startMotion(jsonResponse.motion) }
+        response = jsonResponse.responseText
 
         // getVoiceLocal(response).then((url) => {
         getVoiceOTTO(response).then((url) => {
@@ -247,6 +344,7 @@ export default function App(): JSX.Element {
             onClick={() => { setHideChat(!hideChat) }}
             onPointerOver={() => { setIgnoreMouseEvent(false) }}
             onPointerOut={() => { setIgnoreMouseEvent(true) }}
+            title="Hide/Show Chat"
           >
             <ArrowDropDownIcon style={{
               transform: "rotateX(" + (hideChat ? "0deg" : "180deg"),
@@ -258,15 +356,27 @@ export default function App(): JSX.Element {
             onClick={() => window.api.getScreenShot()}
             onPointerOver={() => { setIgnoreMouseEvent(false) }}
             onPointerOut={() => { setIgnoreMouseEvent(true) }}
-          > <ScreenshotMonitorIcon />
+            title="Screenshot"
+          >
+            {/* <ScreenshotMonitorIcon /> */}
+            <ContentCutIcon />
           </button>
 
 
           <button
             className="miniButton"
-            onClick={() => { setMessages(() => []); setImg("") }}
+            onClick={() => {
+              if (saveOnDelete && messages.length > 0) {
+                getResponseGemini(
+                  [...messages, { role: "user", content: "你是一个智能桌面助手内置的AI。这条消息发送自智能助手系统。用户即将关闭此次对话，并且，用户可能会隔较长时间再进行对话。你的目标是对以往对话内容进行提炼，总结自己的形象，用户的形象，以及在回答中需要注意的内容，以及你想提醒自己的内容作为下一次prompt。请你作为一个总结系统和 prompt 专家，撰写下一次对话时的prompt。请保持描述简洁精确，内容精要。注意，你这次回答的是所有内容会直接记录为下一次prompt" }], apikey, prompt, tokenSaveMode).then((response) => {
+                    window.api.setStore("hiddenPrompt", response)
+                  })
+              }
+              setMessages(() => []); setImg("")
+            }}
             onPointerOver={() => { setIgnoreMouseEvent(false) }}
             onPointerOut={() => { setIgnoreMouseEvent(true) }}
+            title="Clear Chat"
           > <DeleteIcon />
           </button>
 
@@ -276,39 +386,21 @@ export default function App(): JSX.Element {
             onClick={() => { window.api.openConfigWindow() }}
             onPointerOver={() => { setIgnoreMouseEvent(false) }}
             onPointerOut={() => { setIgnoreMouseEvent(true) }}
+            title="Settings"
           > <SettingsIcon /> </button>
 
-          <button className="miniButton"
-            onPointerOver={() => { setIgnoreMouseEvent(false) }}
-            onPointerOut={() => { setIgnoreMouseEvent(true) }}
-            onClick={
-              () => {
-                // console.log(lappAdapter.getMotionGroups())
-                // lappAdapter.nextScene()
-                // lappmanager.startMotion(lappmanager.getMotionGroups()[0], 0, 1)
-                // () => lappmanager.startMotion("Idle", 3, 1)
-                // for(let i = 0; i < lappAdapter.getExpressionCount(); i++) {
-                  // console.log(lappAdapter.getExpressionName(i))
-                // }
-
-                if (lappAdapter.getExpressionCount() > 0) {
-                  lappAdapter.setExpression(lappAdapter.getExpressionName(Math.floor(Math.random() * lappAdapter.getExpressionCount())))
-                }
-              }} ><QuestionMarkIcon /></button>
-
-          {/* <button className="miniButton"
-            onPointerOver={() => { setIgnoreMouseEvent(false) }}
-            onPointerOut={() => { setIgnoreMouseEvent(true) }}
-            onClick={
-              () => {
-                // console.log(lappAdapter.getMotionGroups())
-                // lappAdapter.nextChara()
-                lappAdapter.setChara("D:\\000\\personal\\serika\\src\\renderer\\Resources", "一坨")
-                // lappmanager.startMotion(lappmanager.getMotionGroups()[0], 0, 1)
-                // () => lappmanager.startMotion("Idle", 3, 1)
-              }} ><QuestionMarkIcon /></button> */}
         </div>
         {/* <Paper> */}
+        {/* <Slider
+          size="small"
+          defaultValue={1}
+          aria-label="Small"
+          min={0}
+          max={10}
+          step={0.01}
+          value={slideValue}
+          onChange={(e, value) => { setSlideValue(value as number) }}
+          /> */}
         <input
           id="UserInput"
           type="text"

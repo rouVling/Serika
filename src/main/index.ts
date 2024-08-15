@@ -25,7 +25,7 @@ function createWindow(): void {
     titleBarStyle: 'hiddenInset',
     alwaysOnTop: true,
     frame: false,
-    resizable: false,
+    // resizable: false,
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
       // TODO: 为了方便开发，暂时关闭了 webSecurity，后续需要根据实际情况开启
@@ -104,6 +104,10 @@ function createWindow(): void {
   ipcMain.on("setChara", (event, folder: string, chara: string) => {
     mainWindow.webContents.send('update-chara', folder, chara)
   })
+
+  ipcMain.on("requestModel", (event, value: string) => {
+    mainWindow.webContents.send('modelValueRequested', value)
+  })
 }
 
 // This method will be called when Electron has finished
@@ -159,6 +163,11 @@ app.on('window-all-closed', () => {
 ipcMain.handle("getStore", (event, key) => {
   //@ts-ignore
   return store.get(key)
+})
+
+ipcMain.handle("deleteStore", (event, key) => {
+  //@ts-ignore
+  store.delete(key)
 })
 
 ipcMain.handle("open-file", async () => {

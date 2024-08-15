@@ -1,7 +1,7 @@
-import { LAppLive2DManager } from "../live2d/lapplive2dmanager";
-import { LAppModel } from "../live2d/lappmodel";
-import * as LAppDefine from '../live2d/lappdefine';
-import { LAppPal } from "../live2d/lapppal";
+import { LAppLive2DManager } from "./lapplive2dmanager";
+import { LAppModel } from "./lappmodel";
+import * as LAppDefine from './lappdefine';
+import { LAppPal } from "./lapppal";
 
 import {
   ACubismMotion,
@@ -11,6 +11,8 @@ import {
   CubismMotionQueueEntryHandle,
   InvalidMotionQueueEntryHandleValue
 } from '@framework/motion/cubismmotionqueuemanager';
+import { CubismFramework } from '@framework/live2dcubismframework';
+import { deprecate } from "util";
 
 export let s_adapter_instance : LAppAdapter | null | undefined = null;
 
@@ -25,12 +27,16 @@ export class LAppAdapter {
 
   /* gets */
 
-  private getMgr(): LAppLive2DManager {
+  public getMgr(): LAppLive2DManager {
     return LAppLive2DManager.getInstance();
   }
 
   public getModel(): LAppModel | null {
     return this.getMgr().getModel(0);
+  }
+
+  public getIdManager() {
+    return CubismFramework.getIdManager();
   }
 
   /* motion */
@@ -70,6 +76,7 @@ export class LAppAdapter {
     this.getModel()?.setExpression(name);
   }
 
+  // @deprecated
   public nextChara(): void {
     this.getMgr().nextScene();
   }

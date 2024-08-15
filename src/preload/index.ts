@@ -1,5 +1,5 @@
 import { contextBridge, ipcRenderer } from 'electron'
-import { electronAPI } from '@electron-toolkit/preload'
+import { electronAPI, IpcRenderer } from '@electron-toolkit/preload'
 import { get } from 'http'
 
 // Custom APIs for renderer
@@ -9,6 +9,7 @@ const api = {
   openConfigWindow: () => ipcRenderer.send('open-config-window'),
   getStore: (key: string) => ipcRenderer.invoke('getStore', key),
   setStore: (key: string, value: any) => ipcRenderer.send('setStore', key, value),
+  deleteStore: (key: string) => ipcRenderer.send('deleteStore', key),
   setIgnoreMouseEvent: (ignore: boolean) => ipcRenderer.send('setIgnoreMouseEvent', ignore),
   setEnableClickThrough: (enable: boolean) => ipcRenderer.send('setEnableClickThrough', enable),
   openFile: () => ipcRenderer.invoke('open-file'),
@@ -21,6 +22,11 @@ const api = {
   onUpdateTokenSaveMode: (callback: (value: string) => void) => ipcRenderer.on('update-tokenSaveMode', (_, value) => callback(value)),
   onUpdatePrompt: (callback: (value: string) => void) => ipcRenderer.on('update-prompt', (_, value) => callback(value)),
   onUpdateChara: (callback: (folder: string, chara: string) => void) => ipcRenderer.on('update-chara', (_, folder, chara) => callback(folder, chara)),
+
+  requestModel: (value: any) => ipcRenderer.send("requestModel", value),
+  onModelValueRequested: (callback: (value: string) => void) => ipcRenderer.on("modelValueRequested", (_, value) => callback(value)),
+  sendModelValue: (value: any) => ipcRenderer.send("sendModelValue", value),
+  onModelValueReceived: (callback: (value: string) => void) => ipcRenderer.on("modelValueReceived", (_, value) => callback(value)),
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to

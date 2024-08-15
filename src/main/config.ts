@@ -44,4 +44,9 @@ export function createConfigWindow(): void {
     configWindow.loadFile(join(__dirname, '../renderer/config.html'))
   }
 
+  ipcMain.on("sendModelValue", (event, value) => {
+    if (cfgWindow) {
+      cfgWindow.webContents.send("modelValueReceived", value)
+    }
+  })
 }
