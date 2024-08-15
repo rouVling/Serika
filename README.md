@@ -83,3 +83,9 @@ $ npm run build:linux
 ```
 
 note: the repository is still in development, Framework will be changed into git submodule and live2d SDK will be removed soon.
+
+# 项目维护说明书
+
+## 设置页面
+
+![](readme-src/maintain-config.png)
