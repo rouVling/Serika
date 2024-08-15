@@ -16,18 +16,21 @@ export default function DialogBubble(props: DialogMessage): JSX.Element {
   }
 
   else if (props.role === "assistant") {
-    return <Paper className="dialogBubble assistantBubble" sx={{ backgroundColor: "rgba(30, 30, 30, 0.9)", color: "rgb(200, 200, 200)", borderRadius: "5px" }} >{props.content}{props.voiceUrl ? <VolumeUpIcon onClick={() => {
-      // play voice
-      if (props.voiceType === "string") {
-        const audio = new Audio(props.voiceUrl as string)
-        audio.oncanplay = () => {
-          audio.play()
+    return <Paper className="dialogBubble assistantBubble" sx={{ backgroundColor: "rgba(30, 30, 30, 0.9)", color: "rgb(200, 200, 200)", borderRadius: "5px" }} >{props.content}
+
+      {props.voiceUrl ? <VolumeUpIcon onClick={() => {
+        // play voice
+        if (props.voiceType === "string") {
+          const audio = new Audio(props.voiceUrl as string)
+          audio.oncanplay = () => {
+            audio.play()
+          }
         }
-      }
-      else if (props.voiceType === "element") {
-        (props.voiceUrl as HTMLAudioElement).play()
-      }
-    }} /> : undefined}</Paper>
+        else if (props.voiceType === "element") {
+          (props.voiceUrl as HTMLAudioElement).play()
+        }
+      }} /> : undefined}
+    </Paper>
   } else {
     return <Paper sx={{ display: "flex", justifyContent: "center" }}>{props.content}</Paper>
   }
