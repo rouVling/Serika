@@ -166,7 +166,7 @@ export function getResponseGemini(msgs: DialogMessage[], api_key: string, prompt
   })
 }
 
-export function getJsonResponseGemini(msgs: DialogMessage[], api_key: string, prompt?: string, saveTokenMode: boolean = true): Promise<string | undefined> {
+export function getJsonResponseGemini(msgs: DialogMessage[], api_key: string, prompt?: string, jsonPrompt?: string, saveTokenMode: boolean = true): Promise<string> {
   const genAI = new GoogleGenerativeAI(api_key)
   const model = genAI.getGenerativeModel({
     model: "gemini-1.5-pro",
@@ -205,11 +205,12 @@ export function getJsonResponseGemini(msgs: DialogMessage[], api_key: string, pr
       }
     }
   });
-  // const contents = prompt ? [{ content: prompt, role: "user" }, ...msgs] : msgs
 
   return new Promise((resolve, reject) => {
+    let contents: DialogMessage[] = jsonPrompt ? [{ content: jsonPrompt, role: "user" }, ...msgs] : msgs
+    contents = prompt ? [{ content: prompt, role: "user" }, ...contents] : contents
     model.generateContent({
-      contents: (msgs.map((message, index) => {
+      contents: (contents.map((message, index) => {
         return {
           role: (message.role === "user") ? "user" : "model",
           parts: (message.img) ?
