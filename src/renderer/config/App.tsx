@@ -408,6 +408,13 @@ export default function App() {
                       )
                       setModelMotionConfig(newConfig)
                       window.api.setStore(modelName + ".motions", newConfig)
+                      window.api.requestModel({
+                        method: "post",
+                        body: {
+                          command: "setMotionDesc",
+                          value: newConfig
+                        }
+                      })
                     }}
                     content={{
                       value: motion,

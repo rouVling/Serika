@@ -192,7 +192,16 @@ export function getJsonResponseGemini(msgs: DialogMessage[], api_key: string, pr
             nullable: true
           },
           motion: {
-            type: FunctionDeclarationSchemaType.STRING,
+            // type: FunctionDeclarationSchemaType.STRING,
+            type: FunctionDeclarationSchemaType.OBJECT,
+            properties: {
+              group: {
+                type: FunctionDeclarationSchemaType.STRING,
+              },
+              index: {
+                type: FunctionDeclarationSchemaType.NUMBER,
+              },
+            },
             //@ts-ignore
             nullable: true
           },

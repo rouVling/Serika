@@ -139,6 +139,12 @@ export default function App(): JSX.Element {
           case "setMotionDesc":
             setModelMotionDesc(value.body.value)
             break
+          case "setModelDesc":
+            setModelDesc(value.body.value)
+            break
+          case "setMotionDesc":
+            setModelMotionDesc(JSON.stringify(value.body.value))
+            break
           default:
             break
         }
@@ -188,7 +194,12 @@ export default function App(): JSX.Element {
         })
         window.api.getStore(value2 + ".motions").then((value3) => {
           if (value3) {
-            // TODO
+            setModelMotionDesc(JSON.stringify(value3))
+          }
+        })
+        window.api.getStore(value2 + ".desc").then((value3) => {
+          if (value3) {
+            setModelDesc(value3)
           }
         })
       })
@@ -284,15 +295,15 @@ export default function App(): JSX.Element {
       getJsonResponseGemini(
         (img === "") ? [...messages, { content: input, role: "user" }] : [...messages, { content: input, role: "user", img: img }],
         apikey,
-        prompt + hiddenPrompt,
+        prompt + "以往对话总结:\n" + hiddenPrompt,
         // undefined,
-        "请在 responseText 中回复用户的对话，请注意 prompt。请在 expression 中选择合适的表情（可为空）。表情选项及描述如下：" + modelExpressionDesc,
+        "请在 responseText 中回复用户的对话，回复时请注意 prompt。" + "你使用live2d 作为形象，其描述如下:\n" + modelDesc + "\n请在 expression 中选择合适的表情（可为空）。表情选项及描述如下：\n" + modelExpressionDesc + "\n请选择合适的动作组，以及动作在组中的序号(可为空)。动作选项及描述如下:\n" + modelMotionDesc,
         tokenSaveMode
       ).then((response) => {
 
         const jsonResponse = JSON.parse(response)
         if (jsonResponse.expression !== null) { lappAdapter.setExpression(jsonResponse.expression) }
-        // if (jsonResponse.motion !== null) { lappAdapter.startMotion(jsonResponse.motion) }
+        if (jsonResponse.motion !== null) { lappAdapter.startMotion(jsonResponse.motion.group, jsonResponse.motion.index, LappDefine.PriorityForce) }
         response = jsonResponse.responseText
 
         // getVoiceLocal(response).then((url) => {
@@ -388,6 +399,17 @@ export default function App(): JSX.Element {
             onPointerOut={() => { setIgnoreMouseEvent(true) }}
             title="Settings"
           > <SettingsIcon /> </button>
+
+          <button 
+            className="miniButton"
+            onClick={() => {
+              console.log("modelDesc: ",modelDesc)
+              console.log("modelExpressionDesc: ",modelExpressionDesc)
+              console.log("modelMotionDesc: ",modelMotionDesc)
+            }}
+            onPointerOver={() => { setIgnoreMouseEvent(false) }}
+            onPointerOut={() => { setIgnoreMouseEvent(true) }}
+            ><QuestionMarkIcon /></button>
 
         </div>
         {/* <Paper> */}
