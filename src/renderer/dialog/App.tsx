@@ -400,17 +400,6 @@ export default function App(): JSX.Element {
             title="Settings"
           > <SettingsIcon /> </button>
 
-          <button 
-            className="miniButton"
-            onClick={() => {
-              console.log("modelDesc: ",modelDesc)
-              console.log("modelExpressionDesc: ",modelExpressionDesc)
-              console.log("modelMotionDesc: ",modelMotionDesc)
-            }}
-            onPointerOver={() => { setIgnoreMouseEvent(false) }}
-            onPointerOut={() => { setIgnoreMouseEvent(true) }}
-            ><QuestionMarkIcon /></button>
-
         </div>
         {/* <Paper> */}
         {/* <Slider
