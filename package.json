@@ -35,7 +35,9 @@
     "electron-screenshots": "^0.5.27",
     "electron-store": "^10.0.0",
     "electron-updater": "^6.2.1",
-    "mui-markdown": "^1.2.1"
+    "mui-markdown": "^1.2.1",
+    "openai": "^4.56.0",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "@electron-toolkit/eslint-config-prettier": "^2.0.0",

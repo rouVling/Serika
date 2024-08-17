@@ -1,5 +1,9 @@
 import { DialogMessage, GeminiResponse } from "./types"
 import { SchemaType, GoogleGenerativeAI, HarmBlockThreshold, HarmCategory } from "@google/generative-ai"
+import OpenAI from "openai"
+import { zodResponseFormat } from "openai/helpers/zod"
+import { z } from "zod"
+
 
 export function getVoiceUsingModelscope(inputText): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -126,6 +130,55 @@ export function getResponseGPT(msgs: DialogMessage[], api_key: string, prompt?: 
   })
 }
 
+export function getJsonResponseGPT(msgs: DialogMessage[], api_key: string, prompt?: string, jsonPrompt?: string, baseUrl?: string, saveTokenMode: boolean = true): Promise<string> {
+
+  const openai = new OpenAI({apiKey: api_key, dangerouslyAllowBrowser: true})
+  if (baseUrl) {
+    openai.baseURL = baseUrl
+  }
+
+  const format = z.object({
+    responseText: z.string(),
+    expression: z.string().nullable(),
+    motion: z.object({
+      group: z.string(),
+      index: z.number()
+    }).nullable(),
+    delayTime: z.number().nullable()
+  })
+
+  return new Promise((resolve, reject) => {
+    let contents: DialogMessage[] = jsonPrompt ? [{ content: jsonPrompt, role: "user" }, ...msgs] : msgs
+    contents = prompt ? [{ content: prompt, role: "user" }, ...contents] : contents
+
+    const resp = openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      //@ts-ignore
+      messages: contents.map((message, index) => {
+        return {
+          role: (message.role === "user") ? "user" : "system",
+          content: (message as DialogMessage).img ? (
+            ((saveTokenMode && index === msgs.length - 1) || !saveTokenMode) ? (
+              [{image_url: {url: "data:image/png;base64," + (message as DialogMessage).img}}]
+            ) : (
+              [{ type: "text", text: message.content }]
+            )
+          ) : (
+            [{ type: "text", text: message.content }]
+          )}
+      }),
+      response_format: zodResponseFormat(format, "responseText")
+    })
+
+    resp.then((data) => {
+      resolve(data.choices[0].message.content)
+    }).catch((err) => {
+      reject(err)
+    })
+
+  })
+}
+
 export function getResponseGemini(msgs: DialogMessage[], api_key: string, prompt?: string, saveTokenMode: boolean = true): Promise<string> {
   return new Promise((resolve, reject) => {
 
@@ -167,7 +220,7 @@ export function getResponseGemini(msgs: DialogMessage[], api_key: string, prompt
 }
 
 
-export function getJsonResponseGemini(msgs: DialogMessage[], api_key: string, prompt?: string, jsonPrompt?: string, saveTokenMode: boolean = true): Promise<string> {
+export function getJsonResponseGemini(msgs: DialogMessage[], api_key: string, prompt?: string, jsonPrompt?: string, baseUrl?: string, saveTokenMode: boolean = true): Promise<string> {
   const genAI = new GoogleGenerativeAI(api_key)
   const model = genAI.getGenerativeModel({
     model: "gemini-1.5-pro",
@@ -214,6 +267,8 @@ export function getJsonResponseGemini(msgs: DialogMessage[], api_key: string, pr
         }
       }
     }
+  }, {
+    baseUrl: baseUrl
   });
 
   return new Promise((resolve, reject) => {
