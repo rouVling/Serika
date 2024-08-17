@@ -19,7 +19,7 @@ import SaveIcon from '@mui/icons-material/Save';
 
 import { SendRegular, MoreHorizontalRegular, ChevronUpRegular, ScreenCutRegular,DeleteRegular, SettingsRegular, QuestionRegular } from "@fluentui/react-icons"
 
-import { getVoiceLocal, getVoiceOTTO, getResponseGPT, getResponseGemini, getJsonResponseGemini } from "./api"
+import { getVoiceLocal, getVoiceOTTO, getResponseGPT, getResponseGemini, getJsonResponseGemini, getJsonResponseGPT } from "./api"
 import { ExponentialTimer } from "./utils"
 import { dialog } from "electron"
 import { LAppAdapter } from "../live2d/lappadapter"
@@ -38,13 +38,7 @@ export default function App(): JSX.Element {
   // const classes = defaultStyle()
 
   const [input, setInput] = React.useState<string>("")
-  const [messages, setMessages] = React.useState<DialogMessage[]>([
-    { content: "你好，我是智能桌面助手，有什么可以帮助你的吗？", role: "assistant" },
-    { content: "你好", role: "user" },
-    { content: "我在测试字体", role: "user" },
-    { content: "abcdefghijklmnopqrst", role: "assistant" },
-    { content: "1234567890", role: "assistant" },
-  ])
+  const [messages, setMessages] = React.useState<DialogMessage[]>([])
   const [disableInput, setDisableInput] = React.useState<boolean>(false)
   const [voiceUrl, setVoiceUrl] = React.useState<string>("")
   const [replayVoice, setReplayVoice] = React.useState<boolean>(false)
@@ -230,6 +224,11 @@ export default function App(): JSX.Element {
       })
     })
   }, [])
+  useEffect(() => {
+    window.api.getStore("styleName").then((value: string) => {
+      setStyleName(value)
+    })
+  }, [])
 
   useEffect(() => {
     const audio = new Audio(voiceUrl)
@@ -318,17 +317,20 @@ export default function App(): JSX.Element {
       // getResponseGPT(
       // getResponseGemini(
       getJsonResponseGemini(
+      // getJsonResponseGPT(
         (img === "") ? [...messages, { content: input, role: "user" }] : [...messages, { content: input, role: "user", img: img }],
         apikey,
         prompt + "以往对话总结:\n" + hiddenPrompt,
         // undefined,
         "请在 responseText 中回复用户的对话，回复时请注意 prompt。" + "你使用live2d 作为形象，其描述如下:\n" + modelDesc + "\n请在 expression 中选择合适的表情（可为空）。表情选项及描述如下：\n" + modelExpressionDesc + "\n请选择合适的动作组，以及动作在组中的序号(可为空)。动作选项及描述如下:\n" + modelMotionDesc,
-        tokenSaveMode
+        // "https://api.openai-sb.com/v1/",
+        undefined,
+        tokenSaveMode,
       ).then((response) => {
 
         const jsonResponse = JSON.parse(response)
-        if (jsonResponse.expression !== null) { lappAdapter.setExpression(jsonResponse.expression) }
-        if (jsonResponse.motion !== null) { lappAdapter.startMotion(jsonResponse.motion.group, jsonResponse.motion.index, LappDefine.PriorityForce) }
+        if (jsonResponse.expression !== null && jsonResponse.expression !== undefined) { lappAdapter.setExpression(jsonResponse.expression) }
+        if (jsonResponse.motion !== null && jsonResponse.modtion !== undefined) { lappAdapter.startMotion(jsonResponse.motion.group, jsonResponse.motion.index, LappDefine.PriorityForce) }
         response = jsonResponse.responseText
 
         // getVoiceLocal(response).then((url) => {

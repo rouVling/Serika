@@ -105,6 +105,12 @@ export default function App() {
   }, [])
 
   useEffect(() => {
+    window.api.getStore("styleName").then((value: string) => {
+      setStyleName(value ? value : "default")
+    })
+  }, [])
+
+  useEffect(() => {
     window.api.getStore(modelName + ".desc").then((value) => {
       if (value === undefined) {
         setModelDesc("")
