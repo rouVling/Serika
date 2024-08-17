@@ -1,5 +1,5 @@
 import { DialogMessage, GeminiResponse } from "./types"
-import { FunctionDeclarationSchemaType, GoogleGenerativeAI, HarmBlockThreshold, HarmCategory } from "@google/generative-ai"
+import { SchemaType, GoogleGenerativeAI, HarmBlockThreshold, HarmCategory } from "@google/generative-ai"
 
 export function getVoiceUsingModelscope(inputText): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -166,6 +166,7 @@ export function getResponseGemini(msgs: DialogMessage[], api_key: string, prompt
   })
 }
 
+
 export function getJsonResponseGemini(msgs: DialogMessage[], api_key: string, prompt?: string, jsonPrompt?: string, saveTokenMode: boolean = true): Promise<string> {
   const genAI = new GoogleGenerativeAI(api_key)
   const model = genAI.getGenerativeModel({
@@ -179,34 +180,34 @@ export function getJsonResponseGemini(msgs: DialogMessage[], api_key: string, pr
       responseMimeType: "application/json",
       candidateCount: 1,
       responseSchema: {
-        type: FunctionDeclarationSchemaType.OBJECT,
+        type: SchemaType.OBJECT,
         properties: {
           //@ts-ignore
           responseText: {
-            type: FunctionDeclarationSchemaType.STRING
+            type: SchemaType.STRING
           },
           expression: {
-            type: FunctionDeclarationSchemaType.STRING,
+            type: SchemaType.STRING,
             // required: false
             //@ts-ignore
             nullable: true
           },
           motion: {
             // type: FunctionDeclarationSchemaType.STRING,
-            type: FunctionDeclarationSchemaType.OBJECT,
+            type: SchemaType.OBJECT,
             properties: {
               group: {
-                type: FunctionDeclarationSchemaType.STRING,
+                type: SchemaType.STRING,
               },
               index: {
-                type: FunctionDeclarationSchemaType.NUMBER,
+                type: SchemaType.NUMBER,
               },
             },
             //@ts-ignore
             nullable: true
           },
           delayTime: {
-            type: FunctionDeclarationSchemaType.NUMBER,
+            type: SchemaType.NUMBER,
             //@ts-ignore
             nullable: true
           },
