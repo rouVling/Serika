@@ -1,7 +1,8 @@
 :root {
     --primary-color: #292929;
     /* --primary-color: rgba(30, 30, 30) */
-    --line-grey: #414141;
+    /* --line-grey: #414141; */
+    --line-grey: #292c2c;
     --secondary-color: #cecece;
     --theme-color: #76b9ed;
 }
@@ -9,13 +10,13 @@
 .fluent-dialogContainer {
     left: 5%;
     width: 90%;
-    height: calc(60vh - 60px);
-    margin-top: calc(-60vh + 60px - 40px);
+    height: calc(60vh - 100px);
+    margin-top: calc(-60vh + 100px - 100px);
     overflow-y: auto;
     flex-direction: column;
     align-items: center;
     justify-content: flex-end;
-    padding-bottom: 40px;
+    margin-bottom: 100px;
 }
 
 .fluent-dialogText {
@@ -26,13 +27,19 @@
 .fluent-inputGroup {
     width: 90%;
     background-color: #1f2121;
-    border-radius: 5px;
-    border: solid 1px var(--line-grey);
+    border-radius: 10px;
+    border: solid 2px var(--line-grey);
+}
+
+.fluent-inputGroup svg {
+    width: 20px;
+    height: 20px;
+    margin: 10px;
 }
 
 .fluent-userInput {
     width: 90%;
-    height: 2.5em;
+    height: 4em;
     /* border-radius: 5px; */
     /* border: solid 1px var(--line-grey); */
     border-radius: 5px;
@@ -55,19 +62,19 @@
 .fluent-buttonGroup {
     /* width: fit-content; */
     width: 90%;
-    margin-top: -50px;
+    margin-top: -80px;
     border-radius: 10px;
     height: 40px;
     display: flex;
     flex-direction: row;
     align-items: center;
-    margin-bottom: 10px;
+    margin-bottom: 20px;
 }
 
 .fluent-miniButton {
     height: inherit;
-    background-color: rgba(30, 30, 30, 1);
-    backdrop-filter: blur(10px);
+    background-color: rgba(30, 30, 30, 0.8);
+    backdrop-filter: blur(20px);
     color: white;
     border: none;
     align-self: flex-end;
@@ -80,6 +87,8 @@
 
 .fluent-miniButton svg {
     width: 20px;
+    height: 20px;
+    margin: 5px;
 }
 
 .fluent-miniButton:focus-visible {
