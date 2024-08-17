@@ -1,0 +1,157 @@
+:root {
+    --primary-color: #292929;
+    /* --primary-color: rgba(30, 30, 30) */
+    --line-grey: #414141;
+    --secondary-color: #cecece;
+    --theme-color: #76b9ed;
+}
+
+.fluent-dialogContainer {
+    left: 5%;
+    width: 90%;
+    height: calc(60vh - 60px);
+    margin-top: calc(-60vh + 60px - 40px);
+    overflow-y: auto;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    padding-bottom: 40px;
+}
+
+.fluent-dialogText {
+    color: white;
+    font-size: 24px;
+}
+
+.fluent-inputGroup {
+    width: 90%;
+    background-color: #1f2121;
+    border-radius: 5px;
+    border: solid 1px var(--line-grey);
+}
+
+.fluent-userInput {
+    width: 90%;
+    height: 2.5em;
+    /* border-radius: 5px; */
+    /* border: solid 1px var(--line-grey); */
+    border-radius: 5px;
+    border: none;
+    margin: 0 auto;
+    /* background-color: rgba(195, 201, 255, 0.671); */
+    /* backdrop-filter: blur(14px) saturate(150%); */
+    /* background-color: var(--primary-color); */
+    background-color: #1f2121;
+    color: white;
+    backdrop-filter: blur(3px);
+}
+
+.fluent-userInput:focus {
+    border-color: #76b9ed;
+    outline: none;
+}
+
+
+.fluent-buttonGroup {
+    /* width: fit-content; */
+    width: 90%;
+    margin-top: -50px;
+    border-radius: 10px;
+    height: 40px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.fluent-miniButton {
+    height: inherit;
+    background-color: rgba(30, 30, 30, 1);
+    backdrop-filter: blur(10px);
+    color: white;
+    border: none;
+    align-self: flex-end;
+}
+
+.fluent-miniButton:hover {
+    background-color: rgba(45, 45, 45, 0.8);
+    /* border-radius: 5px; */
+}
+
+.fluent-miniButton svg {
+    width: 20px;
+}
+
+.fluent-miniButton:focus-visible {
+    outline: none;
+    border-color: #76b9ed;
+}
+
+.fluent-settingButton svg {
+    transform-style: preserve-3d;
+    transition: 0.5s;
+    transform: rotateZ(0deg);
+}
+
+.fluent-settingButton {
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+}
+
+.fluent-settingButton:hover svg {
+    transform: rotateZ(90deg);
+}
+
+.fluent-hideChatButton svg {
+    /* justify-self: left; */
+    transform-style: preserve-3d;
+    transition: 0.5s;
+}
+
+.fluent-hideChatButton {
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+}
+
+.fluent-dialogBubble {
+    display: flex;
+    margin: 3px;
+    padding: 3px;
+    /* border-radius: 10px; */
+    pointer-events: none;
+    line-break: anywhere;
+    /* border: solid 1px var(--line-grey); */
+
+    background-color: rgba(30, 30, 30, 0.8);
+    backdrop-filter: blur(10px);
+    color: rgb(200, 200, 200);
+    border-radius: 5px;
+    padding: 0.5rem;
+    /* font-family: "华文楷体"; */
+}
+
+.fluent-userBubble {
+    justify-content: flex-end;
+    margin-left: 30%;
+    margin-right: 10px;
+}
+
+.fluent-assistantBubble {
+    justify-content: flex-start;
+    margin-right: 30%;
+    margin-left: 10px;
+}
+
+.fluent-userBubble div {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.fluent-userBubble div img {
+    border-radius: 5px;
+    max-width: 50%;
+    /* max-height: 50%; */
+    object-fit: cover;
+}

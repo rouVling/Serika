@@ -85,6 +85,9 @@ function createWindow(): void {
       case "prompt":
         mainWindow.webContents.send('update-prompt', value)
         break
+      case "styleName":
+        mainWindow.webContents.send('update-styleName', value)
+        break
     }
   })
 

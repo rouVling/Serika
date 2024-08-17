@@ -2,21 +2,28 @@ import React from "react";
 import { DialogMessage } from "./types";
 import { Paper, TextField } from "@mui/material";
 import VolumeUpIcon from '@mui/icons-material/VolumeUp';
+import { StyleNameContext } from "../style/styleContext";
 
 export default function DialogBubble(props: DialogMessage): JSX.Element {
   // if (props.role === "user") {
+  const styleName = React.useContext(StyleNameContext)
   if (props.role === "user") {
     // if (props.role === "assistant") {
-    return <Paper className="dialogBubble userBubble" sx={{ backgroundColor: "rgba(30, 30, 30, 0.9)", color: "rgb(200, 200, 200)", borderRadius: "5px" }}>
+    return <div
+     className={styleName + "-dialogBubble " + styleName + "-userBubble" }
+    //  sx={{ backgroundColor: "rgba(30, 30, 30, 0.9)", color: "rgb(200, 200, 200)", borderRadius: "5px" }}
+    >
       <div>
         {props.img ? <img src={"data:image/png;base64," + props.img} /> : undefined}
         {props.content}
       </div>
-    </Paper>
+    </div>
   }
 
   else if (props.role === "assistant") {
-    return <Paper className="dialogBubble assistantBubble" sx={{ backgroundColor: "rgba(30, 30, 30, 0.9)", color: "rgb(200, 200, 200)", borderRadius: "5px" }} >{props.content}
+    return <div className={styleName + "-dialogBubble " + styleName + "-assistantBubble" }
+    // sx={{ backgroundColor: "rgba(30, 30, 30, 0.9)", color: "rgb(200, 200, 200)", borderRadius: "5px" }}
+    >{props.content}
 
       {props.voiceUrl ? <VolumeUpIcon onClick={() => {
         // play voice
@@ -30,7 +37,7 @@ export default function DialogBubble(props: DialogMessage): JSX.Element {
           (props.voiceUrl as HTMLAudioElement).play()
         }
       }} /> : undefined}
-    </Paper>
+    </div>
   } else {
     return <Paper sx={{ display: "flex", justifyContent: "center" }}>{props.content}</Paper>
   }

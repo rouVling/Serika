@@ -29,144 +29,8 @@
       display: block;
     }
 
-    /* #live2d {
-    flex-grow: 1;
-    } */
-    #dialog-container {
-      /* position: absolute; */
-      /* top: calc(50vh + 10px); */
-      /* top: calc(30vh); */
-      left: 5%;
-      width: 90%;
-      height: calc(70vh - 60px);
-      margin-top: calc(-70vh + 60px - 40px);
-      /* background: linear-gradient(rgba(0, 0, 255, 0), rgba(67, 64, 79, 0.6)); */
-      /* background: linear-gradient(rgba(0, 0, 0, 0), rgb(41, 41, 41, 0.6)); */
-      /* background: linear-gradient(rgba(0, 0, 0, 0), rgb(41, 41, 41, 0.8)); */
-      background: linear-gradient(rgba(0, 0, 0, 0), rgba(118, 185, 237, 0.1));
-      overflow-y: auto;
-      /* display: flex; */
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-end;
-      padding-bottom: 40px;
-      /* 将子组件排列在底部 */
-      /* pointer-events: none; */
-    }
-
-    #dialog-text {
-      color: white;
-      font-size: 24px;
-    }
-
-    #UserInput {
-      width: 90%;
-      height: 2em;
-      border-radius: 5px;
-      border: solid 1px var(--line-grey);
-      margin: 0 auto;
-      /* background-color: rgba(195, 201, 255, 0.671); */
-      /* backdrop-filter: blur(14px) saturate(150%); */
-      /* background-color: var(--primary-color); */
-      background-color: rgba(30, 30, 30, 0.8);
-      color: white;
-      backdrop-filter: blur(3px);
-    }
-
-    #UserInput:focus {
-      border-color: #76b9ed;
-      outline: none;
-    }
-
     #dragBar {
       min-height: 10px;
-    }
-
-    #buttonGroup {
-      width: 95%;
-      margin-top: -40px;
-      height: 40px;
-      display: flex;
-      flex-direction: row;
-      justify-content: flex-end;
-      align-items: center;
-    }
-
-    .miniButton {
-      height: 30px;
-      /* background-color: rgba(195, 201, 255, 0.671); */
-      /* background-color: var(--primary-color); */
-      background-color: rgba(30, 30, 30, 0.8);
-      color: white;
-      border: solid 1px var(--line-grey);
-      border-radius: 5px;
-      align-self: flex-end;
-      margin: 2px;
-    }
-
-    .miniButton:hover {
-      background-color: rgba(45, 45, 45, 0.8)
-    }
-
-    .miniButton svg {
-      width: 70%;
-    }
-
-    #settingButton svg {
-      transform-style: preserve-3d;
-      transition: 0.5s;
-      transform: rotateZ(0deg);
-    }
-
-    #settingButton:hover svg {
-      transform: rotateZ(90deg);
-    }
-
-    #hideChatButton svg {
-      /* justify-self: left; */
-      transform-style: preserve-3d;
-      transition: 0.5s;
-    }
-
-    #hideChatButton svg {
-      width: 100%;
-      margin-top: 2px;
-    }
-
-    .dialogBubble {
-      display: flex;
-      margin: 3px;
-      padding: 3px;
-      /* border-radius: 10px; */
-      pointer-events: none;
-      line-break: anywhere;
-      border: solid 1px var(--line-grey);
-    }
-
-    .userBubble {
-      justify-content: flex-end;
-      margin-left: 30%;
-      margin-right: 10px;
-    }
-
-    .assistantBubble {
-      justify-content: flex-start;
-      margin-right: 30%;
-      margin-left: 10px;
-    }
-
-    .userBubble div {
-      display: flex;
-      flex-direction: row;
-      justify-content: space-between;
-      width: 100%;
-    }
-
-    .userBubble div img {
-      border-radius: 5px;
-      max-width: 50%;
-      /* max-height: 50%; */
-      object-fit: cover;
     }
 
     div#dragBar {
@@ -191,7 +55,13 @@
       border-bottom: none;
       cursor: move;
     }
+
+    /* #live2d {
+    flex-grow: 1;
+    } */
   </style>
+  <link rel="stylesheet" href="/style/default/dialog.css" />
+  <link rel="stylesheet" href="/style/fluent/dialog.css" />
   <!-- Live2DCubismCore script -->
   <script src="/Core/live2dcubismcore.js"></script>
   <!-- Build script -->

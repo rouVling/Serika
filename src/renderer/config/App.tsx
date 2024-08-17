@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react"
 import { BoolItem, TextFieldItem, TextItemPart, LongTextFieldItem, SelectItem, TextWithButtonItem } from "./components";
-import Store from 'electron-store'
 
 import KeyIcon from '@mui/icons-material/Key';
 import InfoIcon from '@mui/icons-material/Info';
@@ -30,12 +29,9 @@ interface motionConfig {
   name: string[],
 }
 
-export default function App() {
 
-  // const storedApikey = window.api.getStore("apikey") ?? ""
-  // const storedTokenSaveMode = window.api.getStore("tokenSaveMode") ?? true
-  // const storedEnableClickThrough = window.api.getStore("enableClickThrough") ?? false
-  // const storedPrompt = window.api.getStore("prompt") ?? ""
+
+export default function App() {
 
   const [activeChat, setActiveChat] = useState(false) // 未对接
   const [model, setModel] = useState("Gemini-pro")
@@ -52,6 +48,8 @@ export default function App() {
   const [modelDesc, setModelDesc] = useState("")
   const [modelExpressionConfig, setModelExpressionConfig] = useState<expressionConfig[]>([])
   const [modelMotionConfig, setModelMotionConfig] = useState<motionConfig[]>([])
+
+  const [styleName, setStyleName] = useState("default")
 
   const [lappAdapter, setLappAdapter] = useState(undefined)
 
@@ -223,6 +221,9 @@ export default function App() {
         <BoolItem icon={<WalletIcon />} mainText="发送图片时节省 token" description="开启后发送图片时不发送历史聊天图片" type="bool" callback={(val) => { setTokenSaveMode(val); window.api.setStore("tokenSaveMode", val) }} content={tokenSaveMode} />
 
         {/* <TextFieldItem icon={<KeyIcon />} mainText="API Key" description="API Key 用于访问 GPT-SoVits 服务" type="input" callback={(val) => { }} content={apiKey} /> */}
+
+        <SelectItem icon={<SwapHorizIcon />} mainText="风格" description="选择界面风格" type="selection" callback={(val) => { setStyleName(val); window.api.setStore("styleName", val) }} content={{ default: styleName, options: ["default", "fluent"] }} />
+
         <SelectItem icon={<SwapHorizIcon />} mainText="模型" description="选择使用的模型" type="selection" callback={(val) => { setModel(val) }} content={{ default: model, options: ["GPT-4o-mini", "Gemini"] }} />
 
         <TextFieldItem icon={<KeyIcon />} mainText="API Key" description="API Key 用于访问大语言模型" type="input" callback={(val) => { setApikey(val); window.api.setStore("apikey", val) }} content={apikey} />
@@ -244,6 +245,7 @@ export default function App() {
             window.api.setChara(modelPath, modelName)
           }
         }} />
+
 
       </div>
 

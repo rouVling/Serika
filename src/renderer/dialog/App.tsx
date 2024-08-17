@@ -2,7 +2,8 @@ import React, { useEffect } from "react"
 import { DialogMessage } from "./types"
 import DialogBubble from "./components"
 
-import { Collapse, Paper, Box, TextField, Button } from "@mui/material"
+// import { Collapse, Paper, Box, TextField, Button } from "@mui/material"
+import { StyleNameContext } from "../style/styleContext"
 import { promiseHooks } from "v8"
 import { resolve } from "path"
 
@@ -16,6 +17,8 @@ import QuestionMarkIcon from '@mui/icons-material/QuestionMark';
 import PsychologyAltIcon from '@mui/icons-material/PsychologyAlt';
 import SaveIcon from '@mui/icons-material/Save';
 
+import { SendRegular, MoreHorizontalRegular, ChevronUpRegular, ScreenCutRegular,DeleteRegular, SettingsRegular, QuestionRegular } from "@fluentui/react-icons"
+
 import { getVoiceLocal, getVoiceOTTO, getResponseGPT, getResponseGemini, getJsonResponseGemini } from "./api"
 import { ExponentialTimer } from "./utils"
 import { dialog } from "electron"
@@ -23,15 +26,25 @@ import { LAppAdapter } from "../live2d/lappadapter"
 import * as LappDefine from "../live2d/lappdefine"
 import { windowsStore } from "process"
 
-import { Slider } from "@mui/material"
+import { ButtonGroup, Slider } from "@mui/material"
 import { ContactlessOutlined } from "@mui/icons-material"
+
 
 const lappAdapter = LAppAdapter.getInstance()
 
 export default function App(): JSX.Element {
 
+  //@ts-ignore
+  // const classes = defaultStyle()
+
   const [input, setInput] = React.useState<string>("")
-  const [messages, setMessages] = React.useState<DialogMessage[]>([])
+  const [messages, setMessages] = React.useState<DialogMessage[]>([
+    { content: "你好，我是智能桌面助手，有什么可以帮助你的吗？", role: "assistant" },
+    { content: "你好", role: "user" },
+    { content: "我在测试字体", role: "user" },
+    { content: "abcdefghijklmnopqrst", role: "assistant" },
+    { content: "1234567890", role: "assistant" },
+  ])
   const [disableInput, setDisableInput] = React.useState<boolean>(false)
   const [voiceUrl, setVoiceUrl] = React.useState<string>("")
   const [replayVoice, setReplayVoice] = React.useState<boolean>(false)
@@ -54,6 +67,7 @@ export default function App(): JSX.Element {
   const [modelMotionDesc, setModelMotionDesc] = React.useState<string>("")
   const [modelDesc, setModelDesc] = React.useState<string>("")
 
+  const [styleName, setStyleName] = React.useState<string>("default")
 
   // IPC event listeners
 
@@ -116,9 +130,11 @@ export default function App(): JSX.Element {
             window.api.sendModelValue({ name: value, value: exps })
             break
           case "motions":
-            const retval = { name: value, value: lappAdapter.getMotionGroups().map((name) => {
-              return { group: name, num: lappAdapter.getMotionCount(name) }
-            }) }
+            const retval = {
+              name: value, value: lappAdapter.getMotionGroups().map((name) => {
+                return { group: name, num: lappAdapter.getMotionCount(name) }
+              })
+            }
             console.log("dialog/App.tsx: get motions")
             window.api.sendModelValue(retval)
             break
@@ -136,9 +152,9 @@ export default function App(): JSX.Element {
           case "setMotion":
             lappAdapter.startMotion(value.body.value.group, value.body.value.num, LappDefine.PriorityForce)
             break
-          case "setMotionDesc":
-            setModelMotionDesc(value.body.value)
-            break
+          // case "setMotionDesc":
+          //   setModelMotionDesc(value.body.value)
+          //   break
           case "setModelDesc":
             setModelDesc(value.body.value)
             break
@@ -155,6 +171,15 @@ export default function App(): JSX.Element {
         window.api.onModelValueRequested(() => { })
       }
     })
+  }, [])
+
+  useEffect(() => {
+    window.api.onUpdateStyleName((value: string) => {
+      setStyleName(value)
+    })
+    return () => {
+      window.api.onUpdateStyleName(() => { })
+    }
   }, [])
 
   // init store
@@ -330,6 +355,7 @@ export default function App(): JSX.Element {
     <center>
       <div
         id="dialog-container"
+        className={styleName + "-dialogContainer"}
         hidden={hideChat}
         onPointerOver={() => { setIgnoreMouseEvent(false) }}
         onPointerOut={() => { setIgnoreMouseEvent(true) }}
@@ -338,44 +364,51 @@ export default function App(): JSX.Element {
           img !== "" ? <img src={"data:image/png;base64," + img} style={{ width: "inherit", borderRadius: "5px" }} /> : <></>
         }
         {
-          messages.map((message, index) => {
-            return (
-              <DialogBubble key={index} {...message} />
-            )
-          })
+          <StyleNameContext.Provider value={styleName}>
+            {messages.map((message, index) => {
+              return (
+                <DialogBubble key={index} {...message} />
+              )
+            })
+            }
+          </StyleNameContext.Provider>
         }
       </div>
     </center>
-    <div id="inputContainer">
+    <div className={styleName + "-inputContainer"}>
       <center>
-        <div id="buttonGroup">
+        <div className={styleName + "-buttonGroup"}>
           <button
-            className="miniButton"
-            id="hideChatButton"
+            className={styleName + "-miniButton " + styleName + "-hideChatButton"}
+            // id="hideChatButton"
             onClick={() => { setHideChat(!hideChat) }}
             onPointerOver={() => { setIgnoreMouseEvent(false) }}
             onPointerOut={() => { setIgnoreMouseEvent(true) }}
             title="Hide/Show Chat"
           >
+            {styleName === "fluent" && <ChevronUpRegular style={{transform: "rotateX(" + (hideChat ? "0deg" : "180deg")}}
+            />}
+            {styleName === "default" && 
             <ArrowDropDownIcon style={{
               transform: "rotateX(" + (hideChat ? "0deg" : "180deg"),
-            }} />
+            }} />}
           </button>
 
           <button
-            className="miniButton"
+            className={styleName + "-miniButton"}
             onClick={() => window.api.getScreenShot()}
             onPointerOver={() => { setIgnoreMouseEvent(false) }}
             onPointerOut={() => { setIgnoreMouseEvent(true) }}
             title="Screenshot"
           >
             {/* <ScreenshotMonitorIcon /> */}
-            <ContentCutIcon />
+            {styleName === "fluent" && <ScreenCutRegular />}
+            {styleName === "default" && <ContentCutIcon />}
           </button>
 
 
           <button
-            className="miniButton"
+            className={styleName + "-miniButton"}
             onClick={() => {
               if (saveOnDelete && messages.length > 0) {
                 getResponseGemini(
@@ -388,51 +421,80 @@ export default function App(): JSX.Element {
             onPointerOver={() => { setIgnoreMouseEvent(false) }}
             onPointerOut={() => { setIgnoreMouseEvent(true) }}
             title="Clear Chat"
-          > <DeleteIcon />
+          > 
+            {styleName === "fluent" && <DeleteRegular />}
+            {styleName === "default" && <DeleteIcon />}
           </button>
 
           <button
-            className="miniButton"
-            id="settingButton"
+            className={styleName + "-miniButton " + styleName + "-settingButton"}
+            // id="settingButton"
             onClick={() => { window.api.openConfigWindow() }}
             onPointerOver={() => { setIgnoreMouseEvent(false) }}
             onPointerOut={() => { setIgnoreMouseEvent(true) }}
             title="Settings"
-          > <SettingsIcon /> </button>
+          > 
+            {styleName === "fluent" && <SettingsRegular />}
+            {styleName === "default" && <SettingsIcon /> }
+          </button>
+
+          {/* <button
+            className={styleName + "-miniButton"}
+            onClick={() => {
+              // setStyle(fdStyle())
+              // const stl = fdStyle()
+              // setStyle(stl)
+            }}
+            onPointerOver={() => { setIgnoreMouseEvent(false) }}
+            onPointerOut={() => { setIgnoreMouseEvent(true) }}
+            title="Model"
+          > 
+            {styleName === "fluent" && <QuestionRegular />}
+            {styleName === "default" && <QuestionMarkIcon /> }
+          </button> */}
 
         </div>
-        {/* <Paper> */}
-        {/* <Slider
-          size="small"
-          defaultValue={1}
-          aria-label="Small"
-          min={0}
-          max={10}
-          step={0.01}
-          value={slideValue}
-          onChange={(e, value) => { setSlideValue(value as number) }}
-          /> */}
-        <input
-          id="UserInput"
-          type="text"
-          value={input}
-          onChange={(e) => { setInput(e.target.value); }}
-          onKeyDown={handleEnter}
-          disabled={disableInput}
+        <div
+          className={styleName + "-inputGroup"}
+          style={{ display: "flex", flexDirection: "row" }}
           onPointerOver={() => { setIgnoreMouseEvent(false) }}
           onPointerOut={() => { setIgnoreMouseEvent(true) }}
-          onPaste={(e) => {
-            if (e.clipboardData.files[0].type === "image/png") {
-              e.clipboardData.files[0].arrayBuffer().then((buffer) => {
-                setImg(getBase64(new Uint8Array(buffer)))
-              })
-            }
-            else {
-              e.preventDefault()
-            }
-          }}
-        ></input>
-        {/* </Paper> */}
+        >
+          {
+            styleName === "fluent" && <button
+              style={{ backgroundColor: "transparent", color: "white", border: "none", height: "inherit" }}
+            >
+              <MoreHorizontalRegular />
+              {/* <ChevronUpRegular /> */}
+            </button>
+          }
+          <input
+            className={styleName + "-userInput"}
+            // id="UserInput"
+            type="text"
+            value={input}
+            onChange={(e) => { setInput(e.target.value); }}
+            onKeyDown={handleEnter}
+            disabled={disableInput}
+            onPaste={(e) => {
+              if (e.clipboardData.files[0].type === "image/png") {
+                e.clipboardData.files[0].arrayBuffer().then((buffer) => {
+                  setImg(getBase64(new Uint8Array(buffer)))
+                })
+              }
+              else {
+                e.preventDefault()
+              }
+            }}
+          ></input>
+          {
+            styleName === "fluent" && <button
+              style={{ backgroundColor: "transparent", color: "white", border: "none", height: "inherit" }}
+              onClick={() => { handleEnter({ key: "Enter" } as React.KeyboardEvent<HTMLInputElement>) }}
+            ><SendRegular /></button>
+          }
+        </div>
+
       </center>
     </div>
   </>
