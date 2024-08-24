@@ -18,7 +18,10 @@ const api = {
   // getScreenShotResult: () => ipcRenderer.invoke('get-screen-shot-result'),
 
   onUpdateScreenShotResult: (callback: (value: string) => void) => ipcRenderer.on('update-screen-shot-result', (_, value) => callback(value)),
-  onUpdateApikey: (callback: (value: string) => void) => ipcRenderer.on('update-apikey', (_, value) => callback(value)),
+  // onUpdateApikey: (callback: (value: string) => void) => ipcRenderer.on('update-apikey', (_, value) => callback(value)),
+  // onUpdateLLMModel: (callback: (value: string) => void) => ipcRenderer.on('update-llmModel', (_, value) => callback(value)),
+  onUpdateLLMConfigs: (callback: (value: string) => void) => ipcRenderer.on('update-llmConfigs', (_, value) => callback(value)),
+  onUpdateLLMModelName: (callback: (value: string) => void) => ipcRenderer.on('update-llmModelName', (_, value) => callback(value)),
   onUpdateTokenSaveMode: (callback: (value: string) => void) => ipcRenderer.on('update-tokenSaveMode', (_, value) => callback(value)),
   onUpdatePrompt: (callback: (value: string) => void) => ipcRenderer.on('update-prompt', (_, value) => callback(value)),
   onUpdateChara: (callback: (folder: string, chara: string) => void) => ipcRenderer.on('update-chara', (_, folder, chara) => callback(folder, chara)),

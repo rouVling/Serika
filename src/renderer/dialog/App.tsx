@@ -17,9 +17,9 @@ import QuestionMarkIcon from '@mui/icons-material/QuestionMark';
 import PsychologyAltIcon from '@mui/icons-material/PsychologyAlt';
 import SaveIcon from '@mui/icons-material/Save';
 
-import { SendRegular, MoreHorizontalRegular, ChevronUpRegular, ScreenCutRegular,DeleteRegular, SettingsRegular, QuestionRegular } from "@fluentui/react-icons"
+import { SendRegular, MoreHorizontalRegular, ChevronUpRegular, ScreenCutRegular, DeleteRegular, SettingsRegular, QuestionRegular } from "@fluentui/react-icons"
 
-import { getVoiceLocal, getVoiceOTTO, getResponseGPT, getResponseGemini, getJsonResponseGemini, getJsonResponseGPT } from "./api"
+import { getResponse, getVoiceLocal, getVoiceOTTO, getResponseGPT, getResponseGemini, getJsonResponseGemini, getJsonResponseGPT, getTextResponseGPT, LLMModel } from "./api"
 import { ExponentialTimer } from "./utils"
 import { dialog } from "electron"
 import { LAppAdapter } from "../live2d/lappadapter"
@@ -28,7 +28,9 @@ import { windowsStore } from "process"
 
 import { ButtonGroup, Slider } from "@mui/material"
 import { ContactlessOutlined } from "@mui/icons-material"
+import { set } from "zod"
 
+let tmp: any = null
 
 const lappAdapter = LAppAdapter.getInstance()
 
@@ -46,7 +48,6 @@ export default function App(): JSX.Element {
   const [expTimer, setExpTimer] = React.useState<ExponentialTimer | null>(null)
   const [img, setImg] = React.useState<string>("")
 
-  const [apikey, setApikey] = React.useState<string>("")
   const [tokenSaveMode, setTokenSaveMode] = React.useState<boolean>(true)
   const [prompt, setPrompt] = React.useState<string>("")
   const [hiddenPrompt, setHiddenPrompt] = React.useState<string>("")
@@ -55,8 +56,13 @@ export default function App(): JSX.Element {
 
   const [slideValue, setSlideValue] = React.useState<number>(1)
 
-  const [model, setModel] = React.useState<string>("")
-  const [getResponse, setGetResponse] = React.useState<Function>(() => { })
+  const [llmModelName, setLlmModelName] = React.useState("chatGPT")
+  const [llmConfigs, setLlmConfigs] = React.useState({
+    "chatGPT": { model: "GPT-4o-mini", api_key: "", sdk: "openai", jsonMode: true },
+    "Gemini-pro": { model: "gemini-1.5-pro", api_key: "", sdk: "google", jsonMode: true },
+    "chatGLM": { model: "glm-4v", api_key: "", sdk: "openai", jsonMode: true },
+  })
+
   const [modelExpressionDesc, setModelExpressionDesc] = React.useState<string>("")
   const [modelMotionDesc, setModelMotionDesc] = React.useState<string>("")
   const [modelDesc, setModelDesc] = React.useState<string>("")
@@ -76,13 +82,17 @@ export default function App(): JSX.Element {
   }, [])
 
   useEffect(() => {
-    window.api.onUpdateApikey((value: string) => {
-      setApikey(value)
+    window.api.onUpdateLLMConfigs((value: string) => {
+      setLlmConfigs(value)
+    })
+    window.api.onUpdateLLMModelName((value: string) => {
+      setLlmModelName(value)
     })
     return () => {
-      window.api.onUpdateApikey(() => { })
+      window.api.onUpdateLLMConfigs(() => { })
+      window.api.onUpdateLLMModelName(() => { })
     }
-  }, [])
+  } , [])
 
   useEffect(() => {
     window.api.onUpdateTokenSaveMode((value: boolean) => {
@@ -178,8 +188,13 @@ export default function App(): JSX.Element {
 
   // init store
   useEffect(() => {
-    window.api.getStore("apikey").then((value: string) => {
-      setApikey(value ? value : "")
+    window.api.getStore("llmConfigs").then((value: any) => {
+      setLlmConfigs(value)
+    })
+  }, [])
+  useEffect(() => {
+    window.api.getStore("llmModelName").then((value: string) => {
+      setLlmModelName(value)
     })
   }, [])
   useEffect(() => {
@@ -236,11 +251,6 @@ export default function App(): JSX.Element {
       audio.play()
     }
   }, [voiceUrl, replayVoice])
-
-  useEffect(() => {
-    // TODO: change the model
-    setGetResponse(getJsonResponseGemini)
-  }, [model])
 
   // JavaScript event listeners
 
@@ -316,22 +326,44 @@ export default function App(): JSX.Element {
 
       // getResponseGPT(
       // getResponseGemini(
-      getJsonResponseGemini(
+      // getJsonResponseGemini(
       // getJsonResponseGPT(
+      // getTextResponseGPT(
+      //   (img === "") ? [...messages, { content: input, role: "user" }] : [...messages, { content: input, role: "user", img: img }],
+      //   llmConfigs[llmModelName].api_key,
+      //   prompt + "以往对话总结:\n" + hiddenPrompt,
+      //   // prompt,
+      //   // undefined,
+      //   "请在 responseText 中回复用户的对话，回复时请注意 prompt。" + "你使用live2d 作为形象，其描述如下:\n" + modelDesc + "\n请在 expression 中选择合适的表情（可为空）。表情选项及描述如下：\n" + modelExpressionDesc + "\n请在delayTime中填写表情持续时间(毫秒)\n" + "\n请选择合适的动作组，以及动作在组中的序号(可为空)。动作选项及描述如下:\n" + modelMotionDesc,
+      //   // "https://api.openai-sb.com/v1/",
+      //   // undefined,
+      //   "https://open.bigmodel.cn/api/paas/v4/",
+      //   "glm-4v",
+      //   tokenSaveMode
+      //   // getResponse(
+      getResponse(
         (img === "") ? [...messages, { content: input, role: "user" }] : [...messages, { content: input, role: "user", img: img }],
-        apikey,
+        llmConfigs[llmModelName],
         prompt + "以往对话总结:\n" + hiddenPrompt,
-        // undefined,
-        "请在 responseText 中回复用户的对话，回复时请注意 prompt。" + "你使用live2d 作为形象，其描述如下:\n" + modelDesc + "\n请在 expression 中选择合适的表情（可为空）。表情选项及描述如下：\n" + modelExpressionDesc + "\n请选择合适的动作组，以及动作在组中的序号(可为空)。动作选项及描述如下:\n" + modelMotionDesc,
-        // "https://api.openai-sb.com/v1/",
-        undefined,
-        tokenSaveMode,
+        "请在 responseText 中回复用户的对话，回复时请注意 prompt。" + "你使用live2d 作为形象，其描述如下:\n" + modelDesc + "\n请在 expression 中选择合适的表情（可为空）。表情选项及描述如下：\n" + modelExpressionDesc + "\n请在delayTime中填写表情持续时间(毫秒)\n" + "\n请选择合适的动作组，以及动作在组中的序号(可为空)。动作选项及描述如下:\n" + modelMotionDesc,
+        tokenSaveMode
       ).then((response) => {
 
-        const jsonResponse = JSON.parse(response)
-        if (jsonResponse.expression !== null && jsonResponse.expression !== undefined) { lappAdapter.setExpression(jsonResponse.expression) }
-        if (jsonResponse.motion !== null && jsonResponse.modtion !== undefined) { lappAdapter.startMotion(jsonResponse.motion.group, jsonResponse.motion.index, LappDefine.PriorityForce) }
-        response = jsonResponse.responseText
+        try {
+          const jsonResponse = JSON.parse(response)
+          if (jsonResponse.expression !== null && jsonResponse.expression !== undefined) {
+            lappAdapter.setExpression(jsonResponse.expression)
+            setTimeout(() => {
+              lappAdapter.setExpression(lappAdapter.getExpressionName(0))
+            }, jsonResponse.delayTime)
+          }
+          if (jsonResponse.motion !== null && jsonResponse.motion !== undefined) { lappAdapter.startMotion(jsonResponse.motion.group, jsonResponse.motion.index, LappDefine.PriorityForce) }
+          response = jsonResponse.responseText
+        }
+        catch (err) {
+          console.log("failed to parse json response: ", err)
+          response = response
+        }
 
         // getVoiceLocal(response).then((url) => {
         getVoiceOTTO(response).then((url) => {
@@ -388,12 +420,12 @@ export default function App(): JSX.Element {
             onPointerOut={() => { setIgnoreMouseEvent(true) }}
             title="Hide/Show Chat"
           >
-            {styleName === "fluent" && <ChevronUpRegular style={{transform: "rotateX(" + (hideChat ? "0deg" : "180deg")}}
+            {styleName === "fluent" && <ChevronUpRegular style={{ transform: "rotateX(" + (hideChat ? "0deg" : "180deg") }}
             />}
-            {styleName === "default" && 
-            <ArrowDropDownIcon style={{
-              transform: "rotateX(" + (hideChat ? "0deg" : "180deg"),
-            }} />}
+            {styleName === "default" &&
+              <ArrowDropDownIcon style={{
+                transform: "rotateX(" + (hideChat ? "0deg" : "180deg"),
+              }} />}
           </button>
 
           <button
@@ -412,18 +444,23 @@ export default function App(): JSX.Element {
           <button
             className={styleName + "-miniButton"}
             onClick={() => {
-              if (saveOnDelete && messages.length > 0) {
-                getResponseGemini(
-                  [...messages, { role: "user", content: "你是一个智能桌面助手内置的AI。这条消息发送自智能助手系统。用户即将关闭此次对话，并且，用户可能会隔较长时间再进行对话。你的目标是对以往对话内容进行提炼，总结自己的形象，用户的形象，以及在回答中需要注意的内容，以及你想提醒自己的内容作为下一次prompt。请你作为一个总结系统和 prompt 专家，撰写下一次对话时的prompt。请保持描述简洁精确，内容精要。注意，你这次回答的是所有内容会直接记录为下一次prompt" }], apikey, prompt, tokenSaveMode).then((response) => {
-                    window.api.setStore("hiddenPrompt", response)
-                  })
-              }
               setMessages(() => []); setImg("")
+              if (saveOnDelete && messages.length > 0) {
+                getResponse(
+                  [...messages, { role: "user", content: "你是一个智能桌面助手内置的AI。这条消息发送自智能助手系统。用户即将关闭此次对话，并且，用户可能会隔较长时间再进行对话。你的目标是对以往对话内容进行提炼，总结自己的形象，用户的形象，以及在回答中需要注意的内容，以及你想提醒自己的内容作为下一次prompt。请你作为一个总结系统和 prompt 专家，撰写下一次对话时的prompt。请保持描述简洁精确，内容精要。注意，你这次回答的是所有内容会直接记录为下一次prompt" }],
+                  {...llmConfigs[llmModelName], jsonMode: false},
+                  prompt + "以往对话总结:\n" + hiddenPrompt,
+                  undefined,
+                  tokenSaveMode
+                ).then((response) => {
+                  window.api.setStore("hiddenPrompt", response)
+                })
+              }
             }}
             onPointerOver={() => { setIgnoreMouseEvent(false) }}
             onPointerOut={() => { setIgnoreMouseEvent(true) }}
             title="Clear Chat"
-          > 
+          >
             {styleName === "fluent" && <DeleteRegular />}
             {styleName === "default" && <DeleteIcon />}
           </button>
@@ -435,25 +472,11 @@ export default function App(): JSX.Element {
             onPointerOver={() => { setIgnoreMouseEvent(false) }}
             onPointerOut={() => { setIgnoreMouseEvent(true) }}
             title="Settings"
-          > 
+          >
             {styleName === "fluent" && <SettingsRegular />}
-            {styleName === "default" && <SettingsIcon /> }
+            {styleName === "default" && <SettingsIcon />}
           </button>
 
-          {/* <button
-            className={styleName + "-miniButton"}
-            onClick={() => {
-              // setStyle(fdStyle())
-              // const stl = fdStyle()
-              // setStyle(stl)
-            }}
-            onPointerOver={() => { setIgnoreMouseEvent(false) }}
-            onPointerOut={() => { setIgnoreMouseEvent(true) }}
-            title="Model"
-          > 
-            {styleName === "fluent" && <QuestionRegular />}
-            {styleName === "default" && <QuestionMarkIcon /> }
-          </button> */}
 
         </div>
         <div

@@ -94,6 +94,31 @@ export function getVoiceOTTO(inputText: string): Promise<string> {
   })
 }
 
+export interface LLMModel {
+  model: string
+  baseUrl?: string
+  api_key: string
+  sdk: "openai" | "google"
+  jsonMode: boolean
+}
+
+export function getResponse(msgs: DialogMessage[], model: LLMModel, prompt?: string, jsonPrompt?: string, saveTokenMode: boolean = true): Promise<string> {
+  if (model.sdk === "openai") {
+    if (model.jsonMode) {
+      return getJsonResponseGPT(msgs, model.api_key, prompt, jsonPrompt, model.baseUrl, model.model, saveTokenMode)
+    } else {
+      return getTextResponseGPT(msgs, model.api_key, prompt, jsonPrompt, model.baseUrl, model.model, saveTokenMode)
+    }
+  } else {
+    if (model.jsonMode) {
+      return getJsonResponseGemini(msgs, model.api_key, prompt, jsonPrompt, model.baseUrl, model.model, saveTokenMode)
+    } else {
+      return getTextResponseGemini(msgs, model.api_key, prompt, jsonPrompt, model.baseUrl, model.model, saveTokenMode)
+    }
+  }
+}
+
+// @deprecated
 export function getResponseGPT(msgs: DialogMessage[], api_key: string, prompt?: string, saveTokenMode: boolean = true): Promise<string> {
 
   const contents = prompt ? [{ content: prompt, role: "user" }, ...msgs] : msgs
@@ -130,9 +155,48 @@ export function getResponseGPT(msgs: DialogMessage[], api_key: string, prompt?: 
   })
 }
 
-export function getJsonResponseGPT(msgs: DialogMessage[], api_key: string, prompt?: string, jsonPrompt?: string, baseUrl?: string, saveTokenMode: boolean = true): Promise<string> {
+export function getTextResponseGPT(msgs: DialogMessage[], api_key: string, prompt?: string, jsonPrompt?: string, baseUrl?: string, model?: string, saveTokenMode: boolean = true): Promise<string> {
 
-  const openai = new OpenAI({apiKey: api_key, dangerouslyAllowBrowser: true})
+  const openai = new OpenAI({ apiKey: api_key, dangerouslyAllowBrowser: true })
+  if (baseUrl) {
+    openai.baseURL = baseUrl
+  }
+
+  return new Promise((resolve, reject) => {
+    let contents: DialogMessage[] = jsonPrompt ? [{ content: jsonPrompt, role: "user" }, ...msgs] : msgs
+    contents = prompt ? [{ content: prompt, role: "user" }, ...contents] : contents
+
+    const resp = openai.chat.completions.create({
+      model: model ?? "gpt-4o-mini",
+      //@ts-ignore
+      messages: contents.map((message, index) => {
+        return {
+          role: (message.role === "user") ? "user" : "system",
+          content: (message as DialogMessage).img ? (
+            ((saveTokenMode && index === msgs.length - 1) || !saveTokenMode) ? (
+              [{type:"image_url", image_url: { url: "data:image/png;base64," + (message as DialogMessage).img } }]
+            ) : (
+              [{ type: "text", text: message.content }]
+            )
+          ) : (
+            [{ type: "text", text: message.content }]
+          )
+        }
+      }),
+      // response_format: zodResponseFormat(format, "responseText")
+    })
+
+    resp.then((data) => {
+      resolve(data.choices[0].message.content)
+    }).catch((err) => {
+      reject(err)
+    })
+  })
+}
+
+export function getJsonResponseGPT(msgs: DialogMessage[], api_key: string, prompt?: string, jsonPrompt?: string, baseUrl?: string, model?: string, saveTokenMode: boolean = true): Promise<string> {
+
+  const openai = new OpenAI({ apiKey: api_key, dangerouslyAllowBrowser: true })
   if (baseUrl) {
     openai.baseURL = baseUrl
   }
@@ -152,20 +216,21 @@ export function getJsonResponseGPT(msgs: DialogMessage[], api_key: string, promp
     contents = prompt ? [{ content: prompt, role: "user" }, ...contents] : contents
 
     const resp = openai.chat.completions.create({
-      model: "gpt-4o-mini",
+      model: model ?? "gpt-4o-mini",
       //@ts-ignore
       messages: contents.map((message, index) => {
         return {
           role: (message.role === "user") ? "user" : "system",
           content: (message as DialogMessage).img ? (
             ((saveTokenMode && index === msgs.length - 1) || !saveTokenMode) ? (
-              [{image_url: {url: "data:image/png;base64," + (message as DialogMessage).img}}]
+              [{ type:"image_url", image_url: { url: "data:image/png;base64," + (message as DialogMessage).img } }]
             ) : (
               [{ type: "text", text: message.content }]
             )
           ) : (
             [{ type: "text", text: message.content }]
-          )}
+          )
+        }
       }),
       response_format: zodResponseFormat(format, "responseText")
     })
@@ -179,6 +244,7 @@ export function getJsonResponseGPT(msgs: DialogMessage[], api_key: string, promp
   })
 }
 
+// @deprecated
 export function getResponseGemini(msgs: DialogMessage[], api_key: string, prompt?: string, saveTokenMode: boolean = true): Promise<string> {
   return new Promise((resolve, reject) => {
 
@@ -219,11 +285,50 @@ export function getResponseGemini(msgs: DialogMessage[], api_key: string, prompt
   })
 }
 
-
-export function getJsonResponseGemini(msgs: DialogMessage[], api_key: string, prompt?: string, jsonPrompt?: string, baseUrl?: string, saveTokenMode: boolean = true): Promise<string> {
+export function getTextResponseGemini(msgs: DialogMessage[], api_key: string, prompt?: string, jsonPrompt?: string, baseUrl?: string, model?: string, saveTokenMode: boolean = true): Promise<string> {
   const genAI = new GoogleGenerativeAI(api_key)
-  const model = genAI.getGenerativeModel({
-    model: "gemini-1.5-pro",
+  const generativeModel = genAI.getGenerativeModel({
+    model: model ?? "gemini-1.5-pro",
+    safetySettings: [
+      { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_NONE },
+      { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_NONE },
+      { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_NONE },
+    ],
+    generationConfig: {
+      // responseMimeType: "application/json",
+      candidateCount: 1,
+    }
+  }, {
+    baseUrl: baseUrl
+  });
+
+  return new Promise((resolve, reject) => {
+    let contents: DialogMessage[] = jsonPrompt ? [{ content: jsonPrompt, role: "user" }, ...msgs] : msgs
+    contents = prompt ? [{ content: prompt, role: "user" }, ...contents] : contents
+    generativeModel.generateContent({
+      contents: (contents.map((message, index) => {
+        return {
+          role: (message.role === "user") ? "user" : "model",
+          parts: (message.img) ?
+            (
+              ((saveTokenMode && index === msgs.length - 1) || !saveTokenMode) ?
+                [{ text: message.content }, { inlineData: { mimeType: "image/png", data: message.img } }]
+                : ([{ text: message.content }])
+            ) : ([{ text: message.content }])
+        }
+      }))
+    }).then((data) => {
+      resolve(data.response.candidates?.[0]?.content.parts[0].text)
+    }).catch((err) => {
+      reject(err)
+    })
+  })
+}
+
+export function getJsonResponseGemini(msgs: DialogMessage[], api_key: string, prompt?: string, jsonPrompt?: string, baseUrl?: string, model?: string, saveTokenMode: boolean = true): Promise<string> {
+  const genAI = new GoogleGenerativeAI(api_key)
+  const generativeModel = genAI.getGenerativeModel({
+    model: model ?? "gemini-1.5-pro",
     safetySettings: [
       { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_NONE },
       { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_NONE },
@@ -274,7 +379,7 @@ export function getJsonResponseGemini(msgs: DialogMessage[], api_key: string, pr
   return new Promise((resolve, reject) => {
     let contents: DialogMessage[] = jsonPrompt ? [{ content: jsonPrompt, role: "user" }, ...msgs] : msgs
     contents = prompt ? [{ content: prompt, role: "user" }, ...contents] : contents
-    model.generateContent({
+    generativeModel.generateContent({
       contents: (contents.map((message, index) => {
         return {
           role: (message.role === "user") ? "user" : "model",

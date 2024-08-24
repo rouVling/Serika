@@ -35,6 +35,9 @@ function createWindow(): void {
     }
   })
 
+  mainWindow.setAspectRatio(230 / 350)
+  mainWindow.setMenu(null)
+
   // 窗口放在右下角，在菜单栏上
   const { width, height } = screen.getPrimaryDisplay().workAreaSize
   const [windowWidth, windowHeight] = mainWindow.getSize();
@@ -87,6 +90,12 @@ function createWindow(): void {
         break
       case "styleName":
         mainWindow.webContents.send('update-styleName', value)
+        break
+      case "llmConfigs":
+        mainWindow.webContents.send('update-llmConfigs', value)
+        break
+      case "llmModelName":
+        mainWindow.webContents.send('update-llmModelName', value)
         break
     }
   })

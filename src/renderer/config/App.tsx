@@ -18,6 +18,13 @@ import EmojiPeopleIcon from '@mui/icons-material/EmojiPeople';
 import EmojiEmotionsIcon from '@mui/icons-material/EmojiEmotions';
 import SaveIcon from '@mui/icons-material/Save';
 import AccessibleForwardIcon from '@mui/icons-material/AccessibleForward';
+import SmartToyIcon from '@mui/icons-material/SmartToy';
+import HomeRepairServiceIcon from '@mui/icons-material/HomeRepairService';
+import DataObjectIcon from '@mui/icons-material/DataObject';
+import LinkIcon from '@mui/icons-material/Link';
+
+import { LLMModel } from "../dialog/api";
+import { set } from "zod";
 
 interface expressionConfig {
   name: string,
@@ -34,8 +41,13 @@ interface motionConfig {
 export default function App() {
 
   const [activeChat, setActiveChat] = useState(false) // 未对接
-  const [model, setModel] = useState("Gemini-pro")
-  const [apikey, setApikey] = useState("")
+  const [llmModelName, setLlmModelName] = useState("chatGPT")
+  const [llmConfigs, setLlmConfigs] = useState({
+    "chatGPT": { model: "GPT-4o-mini", api_key: "", sdk: "openai", jsonMode: true },
+    "Gemini-pro": { model: "Gemini-pro", api_key: "", sdk: "google", jsonMode: true },
+    "chatGLM": { model: "glm-4v", api_key: "", sdk: "openai", jsonMode: true },
+  })
+  const [currentLLMConfig, setCurrentLLMConfig] = useState<LLMModel>(llmConfigs[llmModelName])
   const [enableClickThrough, setEnableClickThrough] = useState(false)
   const [tokenSaveMode, setTokenSaveMode] = useState(true)
   const [prompt, setPrompt] = useState("")
@@ -56,9 +68,22 @@ export default function App() {
   // const [on, setOn] = useState(false)
 
 
+  // useEffect(() => {
+  //   window.api.getStore("apikey").then((value: string) => {
+  //     setApikey(value ? value : "")
+  //   })
+  // }, [])
   useEffect(() => {
-    window.api.getStore("apikey").then((value: string) => {
-      setApikey(value ? value : "")
+    window.api.getStore("llmConfigs").then((value: any) => {
+      setLlmConfigs(value ? value : {
+        "chatGPT": { model: "GPT-4o-mini", api_key: "", sdk: "openai", jsonMode: true },
+        "Gemini-pro": { model: "gemini-1.5-pro", api_key: "", sdk: "google", jsonMode: true },
+        "chatGLM": { model: "glm-4v", api_key: "", sdk: "openai", jsonMode: true, baseUrl: "https://open.bigmodel.cn/api/paas/v4/" },
+      })
+      window.api.getStore("llmModelName").then((value2: string) => {
+        setLlmModelName(value2 ? value2 : "chatGPT")
+        setCurrentLLMConfig(value[value2 ? value2 : "chatGPT"])
+      })
     })
   }, [])
 
@@ -80,11 +105,6 @@ export default function App() {
     })
   }, [])
 
-  useEffect(() => {
-    window.api.getStore("model").then((value: string) => {
-      setModel(value ? value : "Gemini")
-    })
-  }, [])
 
   useEffect(() => {
     window.api.getStore("modelPath").then((value: string) => {
@@ -230,15 +250,101 @@ export default function App() {
 
         <SelectItem icon={<SwapHorizIcon />} mainText="风格" description="选择界面风格" type="selection" callback={(val) => { setStyleName(val); window.api.setStore("styleName", val) }} content={{ default: styleName, options: ["default", "fluent"] }} />
 
-        <SelectItem icon={<SwapHorizIcon />} mainText="模型" description="选择使用的模型" type="selection" callback={(val) => { setModel(val) }} content={{ default: model, options: ["GPT-4o-mini", "Gemini"] }} />
+        <SelectItem icon={<SwapHorizIcon />} mainText="模型" description="选择使用的模型" type="selection" callback={(val) => {
+          setLlmModelName(val);
+          setCurrentLLMConfig(llmConfigs[val]);
+          window.api.setStore("llmModelName", val)
+        }} content={{ default: llmModelName, options: ["chatGPT", "Gemini-pro", "chatGLM"] }} />
 
-        <TextFieldItem icon={<KeyIcon />} mainText="API Key" description="API Key 用于访问大语言模型" type="input" callback={(val) => { setApikey(val); window.api.setStore("apikey", val) }} content={apikey} />
+        <TextFieldItem icon={<SmartToyIcon />} mainText="model" description="使用的模型(请注意模型是否支持视觉功能)" type="input" callback={(val) => {
+          setLlmConfigs(() => {
+            return {
+              ...llmConfigs,
+              [llmModelName]: { ...currentLLMConfig, model: val }
+            }
+          })
+          setCurrentLLMConfig(() => {
+            return { ...currentLLMConfig, model: val }
+          })
+          window.api.setStore("llmConfigs", {
+            ...llmConfigs,
+            [llmModelName]: { ...currentLLMConfig, model: val }
+          })
+        }}
+          content={currentLLMConfig.model} />
+
+        <TextFieldItem icon={<KeyIcon />} mainText="API Key" description="API Key 用于访问大语言模型" type="input" callback={(val) => {
+          setLlmConfigs(() => {
+            return {
+              ...llmConfigs,
+              [llmModelName]: { ...currentLLMConfig, api_key: val }
+            }
+          })
+          setCurrentLLMConfig(() => {
+            return { ...currentLLMConfig, api_key: val }
+          })
+          window.api.setStore("llmConfigs", {
+            ...llmConfigs,
+            [llmModelName]: { ...currentLLMConfig, api_key: val }
+          })
+        }}
+          content={currentLLMConfig.api_key} />
+
+        <TextFieldItem icon={<LinkIcon />} mainText="base url" description="base url" type="input" callback={(val) => {
+          setLlmConfigs(() => {
+            return {
+              ...llmConfigs,
+              [llmModelName]: { ...currentLLMConfig, baseUrl: (val === "")? undefined: val }
+            }
+          })
+          setCurrentLLMConfig(() => {
+            return { ...currentLLMConfig, baseUrl: (val === "")? undefined: val }
+          })
+          window.api.setStore("llmConfigs", {
+            ...llmConfigs,
+            [llmModelName]: { ...currentLLMConfig, baseUrl: (val === "")? undefined: val }
+          })
+        }}
+          content={currentLLMConfig.baseUrl ?? ""} />
+
+        <SelectItem icon={<HomeRepairServiceIcon />} mainText="sdk" description="选择使用的 sdk" type="selection" callback={(val) => {
+          setCurrentLLMConfig(() => {
+            return { ...currentLLMConfig, sdk: val }
+          })
+          setLlmConfigs(() => {
+            return {
+              ...llmConfigs,
+              [llmModelName]: { ...currentLLMConfig, sdk: val }
+            }
+          })
+          window.api.setStore("llmConfigs", {
+            ...llmConfigs,
+            [llmModelName]: { ...currentLLMConfig, sdk: val }
+          })
+        }} content={{ default: currentLLMConfig.sdk, options: ["openai", "google"] }} />
+
+        <BoolItem icon={<DataObjectIcon />} mainText="jsonMode" description="json mode 下模型可以调用表情动作" type="bool" callback={(val) => {
+          setCurrentLLMConfig(() => {
+            return { ...currentLLMConfig, jsonMode: val }
+          })
+          setLlmConfigs(() => {
+            return {
+              ...llmConfigs,
+              [llmModelName]: { ...currentLLMConfig, jsonMode: val }
+            }
+          })
+          window.api.setStore("llmConfigs", {
+            ...llmConfigs,
+            [llmModelName]: { ...currentLLMConfig, jsonMode: val }
+          })
+        }} content={currentLLMConfig.jsonMode} />
 
         <LongTextFieldItem icon={<NotesIcon />} mainText="prompt" description="prompt 用于提示模型回复" type="input" callback={(val) => { setPrompt(val); window.api.setStore("prompt", val) }} content={prompt} />
 
         <TextWithButtonItem icon={<FolderIcon />} mainText="live2d 模型库文件夹" description="存放 live2d 模型的文件夹路径" type="input" callback={(val) => { setModelPath(val); window.api.setStore("modelPath", val) }} content={{
           value: modelPath, buttonText: "选择文件夹", action: () => {
             window.api.openFolder().then((value: string) => {
+              if (value === "") return
               setModelPath(() => { return value })
               window.api.setStore("modelPath", value)
             })
@@ -269,7 +375,7 @@ export default function App() {
             基础信息
           </div>
         </div>
-        <LongTextFieldItem icon={<NotesIcon />} mainText="character" description="模型的描述" type="input" callback={(val) => { setModelDesc(val); window.api.setStore(modelName + ".desc", val); window.api.requestModel({ method: "post", body: { command: "setModelDesc", value: val}}) }} content={modelDesc} />
+        <LongTextFieldItem icon={<NotesIcon />} mainText="character" description="模型的描述" type="input" callback={(val) => { setModelDesc(val); window.api.setStore(modelName + ".desc", val); window.api.requestModel({ method: "post", body: { command: "setModelDesc", value: val } }) }} content={modelDesc} />
 
         <div style={{ display: "flex", flexDirection: "row", justifyContent: "space-between", marginBottom: "10px", marginTop: "20px" }}>
           <div style={{ fontSize: "24px" }}>
