@@ -40,20 +40,21 @@
       border: solid 5px var(--primary-color);
       border-right: solid 5px transparent;
       border-bottom: solid 5px transparent;
-      cursor: move;
+      /* cursor: move; */
       /* background-color: var(--theme-color) */
     }
 
     div#dragBarEdge {
-      /* margin-top: 10%; */
-      /* margin-bottom: -10%; */
-      /* margin-left: 5%; */
-      height: 20px;
-      width: 20px;
+      margin-top: 10px; 
+      margin-bottom: -10px;
+      z-index: 1;
+      margin-left: 10px;
+      height: 25px;
+      width: 25px;
       border: solid 1px var(--line-grey);
       border-right: none;
       border-bottom: none;
-      cursor: move;
+      /* background-color: #292929; */
     }
 
     /* #live2d {
@@ -69,9 +70,11 @@
 </head>
 
 <body>
-  <div id="dragBarEdge" style="-webkit-app-region: drag">
+  <div id="dragBarEdge">
     <div id="dragBar" style="-webkit-app-region: drag"></div>
+    <!-- <div id="dragBar" ></div> -->
   </div>
+   <!-- <div style="height: 50px; cursor: move; background-color:#414141; -webkit-app-region: drag">test</div> -->
   <div id="live2d"></div>
   <div id="root"></div>
   <script type="module" src="/dialog/main.tsx"></script>

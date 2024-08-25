@@ -264,14 +264,22 @@ export default function App(): JSX.Element {
   }, [messages])
 
   useEffect(() => {
-    const dragBar = document.getElementById("dragBar")
-    dragBar?.addEventListener("pointerover", () => {
-      // console.log("enable touching")
+    const dragBar = document.getElementById("dragBarEdge")
+    dragBar?.addEventListener("pointerover", (e: PointerEvent) => {
+      const bar = dragBar.children[0] as HTMLElement
+      bar.style.borderLeftColor = "#cecece"
+      bar.style.borderTopColor = "#cecece"
       setIgnoreMouseEvent(false)
     })
-    dragBar?.addEventListener("pointerout", () => {
-      // console.log("disable touching")
-      setIgnoreMouseEvent(true)
+    dragBar?.addEventListener("pointerleave", (e: PointerEvent) => {
+      if(e.relatedTarget === null) {
+        return
+      }else {
+        const bar = dragBar.children[0] as HTMLElement
+        bar.style.borderLeftColor = "var(--border-color)"
+        bar.style.borderTopColor = "var(--border-color)"
+        setIgnoreMouseEvent(true)
+      }
     })
     return () => {
       dragBar?.removeEventListener("pointerover", () => { })
@@ -477,6 +485,70 @@ export default function App(): JSX.Element {
             {styleName === "default" && <SettingsIcon />}
           </button>
 
+          {/* <button
+            className={styleName + "-miniButton"}
+            onClick={() => {
+
+              navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
+                // save the stream
+                tmp = stream
+                // create a media recorder
+                const mediaRecorder = new MediaRecorder(stream)
+                // tmp = mediaRecorder
+                // create a data array
+                const chunks: any = []
+                // when the media recorder receives data
+                mediaRecorder.ondataavailable = (e) => {
+                  // add the data to the array
+                  chunks.push(e.data)
+                }
+                // when the media recorder stops
+                mediaRecorder.onstop = () => {
+                  // create a blob from the data
+                  const blob = new Blob(chunks, { type: "audio/ogg; codecs=opus" })
+                  // create a url from the blob
+                  const url = URL.createObjectURL(blob)
+                  // set the url to the audio element
+                  setVoiceUrl(url)
+                  // create a new audio element
+                  const audio = new Audio(url)
+                  // play the audio
+                  audio.play()
+                }
+
+                setTimeout(() => {
+                  // stop the media recorder
+                  mediaRecorder.stop()
+                  // stop the stream
+                  stream.getTracks().forEach((track) => {
+                    track.stop()
+                  })
+                }, 5000)
+              })
+
+            }}
+            onPointerOver={() => { setIgnoreMouseEvent(false) }}
+            onPointerOut={() => { setIgnoreMouseEvent(true) }}
+            title="Model"
+          >
+            {styleName === "fluent" && <QuestionRegular />}
+            {styleName === "default" && <QuestionMarkIcon />}
+          </button>
+
+          <button
+            className={styleName + "-miniButton"}
+            onClick={() => {
+
+              // tmp.stop()
+
+            }}
+            onPointerOver={() => { setIgnoreMouseEvent(false) }}
+            onPointerOut={() => { setIgnoreMouseEvent(true) }}
+            title="Model"
+          >
+            {styleName === "fluent" && <PsychologyAltIcon />}
+            {styleName === "default" && <PsychologyAltIcon />}
+          </button> */}
 
         </div>
         <div

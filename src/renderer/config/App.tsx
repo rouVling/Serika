@@ -242,7 +242,7 @@ export default function App() {
     <div id="rightContainer" >
       <div hidden={tabNum !== 0}>
         <div className="rightContainerTitle">通用设置</div>
-        <BoolItem icon={<AdsClickIcon />} mainText="启用点击穿透" description="聊天框点击不穿透; 模型 hitArea 缺失会导致穿透面积增大; 点击穿透后无法拖动窗口 (待修复) " type="bool" callback={(val) => { setEnableClickThrough(val); window.api.setStore("enableClickThrough", val); window.api.setEnableClickThrough(val) }} content={enableClickThrough} />
+        <BoolItem icon={<AdsClickIcon />} mainText="启用点击穿透" description="UI元素点击不穿透; 模型 hitArea 缺失会导致穿透面积增大; " type="bool" callback={(val) => { setEnableClickThrough(val); window.api.setStore("enableClickThrough", val); window.api.setEnableClickThrough(val) }} content={enableClickThrough} />
 
         <BoolItem icon={<WalletIcon />} mainText="发送图片时节省 token" description="开启后发送图片时不发送历史聊天图片" type="bool" callback={(val) => { setTokenSaveMode(val); window.api.setStore("tokenSaveMode", val) }} content={tokenSaveMode} />
 
