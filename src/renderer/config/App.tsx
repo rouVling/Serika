@@ -307,7 +307,7 @@ export default function App() {
             setLlmModelName(val);
             setCurrentLLMConfig(llmConfigs[val]);
             window.api.setStore("llmModelName", val)
-          }} content={{ default: llmModelName, options: ["chatGPT", "Gemini-pro", "chatGLM"] }} />
+          }} content={{ default: llmModelName, options: Object.keys(llmConfigs) }} />
 
           <TextFieldItem icon={<SmartToyIcon />} mainText="model" description="使用的模型(请注意模型是否支持视觉功能)" type="input" callback={(val) => {
             setLlmConfigs(() => {
@@ -650,7 +650,7 @@ export default function App() {
                 }
               }
             })
-            window.api.setStore("SoVitsConfigs",{
+            window.api.setStore("SoVitsConfigs", {
               ...SoVitsConfigs,
               configs: {
                 ...SoVitsConfigs.configs,
@@ -746,7 +746,7 @@ export default function App() {
             })
             window.api.setStore("SoVitsConfigs", SoVitsConfigs)
           }} content={currentSoVitsConfig.top_k.toString()} /> */}
-          
+
         </div>
 
         <div hidden={tabNum !== 4}>
