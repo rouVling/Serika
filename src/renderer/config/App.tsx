@@ -50,7 +50,7 @@ export default function App() {
   const [activeChat, setActiveChat] = useState(false) // 未对接
   const [llmModelName, setLlmModelName] = useState("chatGPT")
   const [llmConfigs, setLlmConfigs] = useState({
-    "chatGPT": { model: "GPT-4o-mini", api_key: "", sdk: "openai", jsonMode: true },
+    "chatGPT": { model: "gpt-4o-mini", api_key: "", sdk: "openai", jsonMode: true },
     "Gemini-pro": { model: "Gemini-pro", api_key: "", sdk: "google", jsonMode: true },
     "chatGLM": { model: "glm-4v", api_key: "", sdk: "openai", jsonMode: true },
   })
