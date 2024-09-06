@@ -23,6 +23,7 @@ import HomeRepairServiceIcon from '@mui/icons-material/HomeRepairService';
 import DataObjectIcon from '@mui/icons-material/DataObject';
 import LinkIcon from '@mui/icons-material/Link';
 import LanguageIcon from '@mui/icons-material/Language';
+import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd';
 
 import { SettingsRegular } from "@fluentui/react-icons";
 
@@ -97,6 +98,7 @@ export default function App() {
     }
   })
   const [currentSoVitsConfig, setCurrentSoVitsConfig] = useState<SoVITSConfig>(SoVitsConfigs.configs[SoVitsConfigs.current])
+  const [newSoVitsConfigName, setNewSoVitsConfigName] = useState<string>("")
 
   // const [lappAdapter, setLappAdapter] = useState(undefined)
 
@@ -127,6 +129,7 @@ export default function App() {
       if (value !== undefined) {
         setSoVitsConfigs(value)
         setCurrentSoVitsConfig(value.configs[value.current])
+        console.log(value.configs[value.current])
       }
     })
   }, [])
@@ -730,6 +733,46 @@ export default function App() {
               }
             })
           }} content={{ default: currentSoVitsConfig.prompt_lang, options: ["all_zh", "en", "all_ja", "all_yue", "all_ko", "zh", "ja", "yue", "ko", "auto", "auto_yue"] }} />
+
+          <TextWithButtonItem icon={<PlaylistAddIcon />} mainText="增加选项" description="" type="input" callback={(val) => {
+            setNewSoVitsConfigName(val)
+          }} content={{
+            value: newSoVitsConfigName, buttonText: "增加", action: () => {
+              if (newSoVitsConfigName === "") return
+              const newConfig = {
+                  current: newSoVitsConfigName,
+                  configs: {
+                    ...SoVitsConfigs.configs,
+                    [newSoVitsConfigName]: {
+                      "text_lang": "zh",
+                      "ref_audio_path": "C:/fakepath/audio.wav",
+                      "aux_ref_audio_paths": [],
+                      "prompt_text": "",
+                      "prompt_lang": "zh",
+                      "top_k": 5,
+                      "top_p": 1,
+                      "temperature": 1,
+                      "text_split_method": "cut0",  // fixed
+                      "batch_size": 1,  // fixed
+                      "batch_threshold": 0.75, // fixed
+                      "split_bucket": true, // fixed
+                      "return_fragment": false, // fixed
+                      "speed_factor": 1.0, // fixed
+                      "streaming_mode": false, // fixed
+                      "seed": -1, // fixed
+                      "parallel_infer": true, // fixed
+                      "repetition_penalty": 1.35, // fixed
+                      "media_type": "wav",    // not supported for now
+                    }
+                  }
+                }
+              setSoVitsConfigs(newConfig)
+              setCurrentSoVitsConfig(newConfig.configs[newSoVitsConfigName])
+              setNewSoVitsConfigName("")
+              window.api.setStore("SoVitsConfigs", newConfig)
+            }
+          }}/>
+
 
           {/* <TextFieldItem icon={<KeyIcon />} mainText="top_k" description="top_k" type="input" callback={(val) => {
             setCurrentSoVitsConfig(() => {
